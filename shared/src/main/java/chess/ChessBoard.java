@@ -19,7 +19,11 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        squares[position.getRow()][position.getColumn()] = piece;
+        //squares[position.getRow()][position.getColumn()] = piece;
+        int row = position.getRow() - 1;
+        int col = position.getColumn() - 1;
+
+        squares[row][col] = piece;
     }
     /**
      * Gets a chess piece on the chessboard
@@ -28,9 +32,20 @@ public class ChessBoard {
      * @return Either the piece at the position, or null if no piece is at that
      * position
      */
-    public ChessPiece getPiece(ChessPosition position) {
-        return squares[position.getRow()][position.getColumn()];
+    public ChessPiece getPiece(ChessPosition position)
+    {
+        //return squares[position.getRow()][position.getColumn()];
 
+        int row = position.getRow() - 1;
+        int col = position.getColumn() - 1;
+        //make sure that the board is 0 indexed for the check in "isValidMove"
+
+
+        if (row < 0 || row >= 8 || col < 0 || col >=8)
+        {
+            return null;
+        }
+        return squares[row][col];
     }
 
     /**
