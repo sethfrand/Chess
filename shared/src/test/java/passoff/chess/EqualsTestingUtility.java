@@ -19,7 +19,7 @@ import java.util.Set;
  *
  * @param <T> The type to be compared during testing.
  */
-public abstract classEqualsTestingUtility<T> {
+public abstract class EqualsTestingUtility<T> {
     private final String className;
     private final String itemsPlural;
     private T original;
