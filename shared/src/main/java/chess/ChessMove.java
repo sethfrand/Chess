@@ -12,7 +12,7 @@ public class ChessMove
 {
 private final ChessPosition startPosition;
 private final ChessPosition endPosition;
-private final ChessPiece.PieceType promotionPiece;
+private ChessPiece.PieceType promotionPiece;
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece)
@@ -46,5 +46,38 @@ private final ChessPiece.PieceType promotionPiece;
     public ChessPiece.PieceType getPromotionPiece()
     {
         return promotionPiece;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = startPosition.hashCode();
+        result = 31 * result + endPosition.hashCode();
+        result = 31 * result + (promotionPiece != null ? promotionPiece.hashCode() : 0);
+        return result;
+
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+        {
+            return true;
+        };
+        if (obj == null || getClass() != obj.getClass())
+        {
+            return false;
+        }
+        ChessMove move = (ChessMove) obj;
+
+        if (!startPosition.equals(move.startPosition)) return false;
+        if (!endPosition.equals(move.endPosition)) return false;
+        if (promotionPiece == null)
+        {
+            return move.promotionPiece == null;
+        }
+        else
+        {
+            return promotionPiece.equals(move.promotionPiece);
+        }
     }
 }

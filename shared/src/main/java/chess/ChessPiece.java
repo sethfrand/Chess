@@ -14,11 +14,11 @@ import java.util.Collection;
 public class ChessPiece {
 
 
-    private final ChessGame.TeamColor pieceColor;
+    private final ChessGame.TeamColor team;
     private final PieceType type;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
-        this.pieceColor = pieceColor;
+        this.team = pieceColor;
         this.type = type;
     }
 
@@ -39,7 +39,7 @@ public class ChessPiece {
      */
     public ChessGame.TeamColor getTeamColor()
     {
-        return pieceColor;
+        return team;
     }
 
     /**
@@ -57,7 +57,8 @@ public class ChessPiece {
      *
      * @return Collection of valid moves
      */
-    public HashSet<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+    public HashSet<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition)
+    {
         switch(getPieceType())
         {
             case BISHOP:
@@ -75,6 +76,40 @@ public class ChessPiece {
             default: new HashSet<>();
         }
         return null;
+
+    }
+    @Override
+    public String toString()
+    {
+        return switch (type)
+        {
+            case KING -> team == ChessGame.TeamColor.WHITE ? "K" : "k";
+            case QUEEN -> team == ChessGame.TeamColor.WHITE ? "Q" : "q";
+            case KNIGHT -> team == ChessGame.TeamColor.WHITE ? "N" : "n";
+            case PAWN -> team == ChessGame.TeamColor.WHITE ? "P" : "p";
+            case ROOK -> team == ChessGame.TeamColor.WHITE ? "R" : "r";
+            case BISHOP -> team == ChessGame.TeamColor.WHITE ? "B" : "b";
+        };
+    }
+
+    @Override
+    public int hashCode() {
+        int result = team.hashCode();
+        result = 31 * result + type.hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return false;
+        if (obj == null || getClass() != obj.getClass())
+        {
+            return false;
+        }
+        ChessPiece piece = (ChessPiece) obj;
+        if (team != piece.team) return false;
+        return type == piece.type;
+
 
     }
 }
