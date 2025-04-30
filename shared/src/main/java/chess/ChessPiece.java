@@ -1,9 +1,6 @@
 package chess;
 
-import chess.MoveCalculators.BishopMoveCalc;
-import chess.MoveCalculators.KingMoveCalc;
-import chess.MoveCalculators.PawnMoveCalc;
-import chess.MoveCalculators.RookMoveCalc;
+import chess.MoveCalculators.*;
 
 import java.util.HashSet;
 
@@ -70,9 +67,9 @@ public class ChessPiece {
             case KING:
                 return KingMoveCalc.getMoves(board,myPosition);
             case QUEEN:
-                return null;
+                return QueenMoveCalc.getMoves(board,myPosition);
             case KNIGHT:
-                return null;
+                return KnightMoveCalc.getMoves(board,myPosition);
             case ROOK:
                 return RookMoveCalc.getMoves(board,myPosition);
             case PAWN:
