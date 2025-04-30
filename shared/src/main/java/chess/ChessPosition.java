@@ -45,7 +45,7 @@ public class ChessPosition {
         if (this == obj)
         {
             return true;
-        };
+        }
         if (obj == null || getClass() != obj.getClass())
         {
             return false;
@@ -53,5 +53,5 @@ public class ChessPosition {
         ChessPosition position = (ChessPosition) obj;
         if (row != position.row) return false;
         return col == position.col;
-    };
+    }
 }

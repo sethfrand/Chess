@@ -62,7 +62,7 @@ private ChessPiece.PieceType promotionPiece;
         if (this == obj)
         {
             return true;
-        };
+        }
         if (obj == null || getClass() != obj.getClass())
         {
             return false;
