@@ -1,34 +1,31 @@
 package chess.MoveCalculators;
 
-import chess.ChessMove;
 import chess.ChessBoard;
+import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
 import java.util.HashSet;
 
-public class KingMoveCalc
-{
+
+public class PawnMoveCalc {
     private static final int[][] Directions =
             {
-                    //*from perspective of white
+                    // *from perspective of white
                     {1,0}, // up/forward
-                    {0,1}, // right
-                    {0,-1}, // left
-                    {-1,0}, // down/backward
-                    {1,1}, // up right
-                    {1,-1}, // up left
-                    {-1,-1}, // down left
-                    {-1,1} // down right
             };
+    //Create check to see if position is valid. need to pass in the current row and column
+    //update the current position
     public static HashSet<chess.ChessMove>getMoves(chess.ChessBoard board, ChessPosition position) {
         HashSet<ChessMove> validMove = new HashSet<>();
         ChessPiece piece = board.getPiece(position);
 
-        if (piece == null) {
+        if (piece == null) // base case for if the piece isn't there
+        {
             return validMove;
         }
-        for (int[] direction : Directions) // check all possible moves
+
+        for (int[] direction : Directions) // check if move is possible
         {
             int rowInc = direction[0];
             int colInc = direction[1];
@@ -51,10 +48,8 @@ public class KingMoveCalc
         }
         return validMove;
     }
-    static boolean isValidMove(int row, int col)
-    {
-        return row >= 1 && row <= 8 && col >= 1 && col <= 8;
+        static boolean isValidMove(int row, int col)
+        {
+            return row >= 1 && row <= 8 && col >= 1 && col <= 8;
+        }
     }
-}
-
-

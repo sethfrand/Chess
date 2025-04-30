@@ -2,6 +2,8 @@ package chess;
 
 import chess.MoveCalculators.BishopMoveCalc;
 import chess.MoveCalculators.KingMoveCalc;
+import chess.MoveCalculators.PawnMoveCalc;
+import chess.MoveCalculators.RookMoveCalc;
 
 import java.util.HashSet;
 
@@ -72,9 +74,9 @@ public class ChessPiece {
             case KNIGHT:
                 return null;
             case ROOK:
-                return null;
+                return RookMoveCalc.getMoves(board,myPosition);
             case PAWN:
-                return null;
+                return PawnMoveCalc.getMoves(board,myPosition);
             default: new HashSet<>();
         }
         return null;
