@@ -63,20 +63,19 @@ public class ChessPiece {
         switch(getPieceType())
         {
             case BISHOP:
-                return BishopMoveCalc.getMoves(board,myPosition);
+                return chess.MoveCalculators.BishopMoveCalc.getMoves(board,myPosition);
             case KING:
-                return KingMoveCalc.getMoves(board,myPosition);
+                return chess.MoveCalculators.KingMoveCalc.getMoves(board,myPosition);
             case QUEEN:
-                return QueenMoveCalc.getMoves(board,myPosition);
+                return chess.MoveCalculators.QueenMoveCalc.getMoves(board,myPosition);
             case KNIGHT:
-                return KnightMoveCalc.getMoves(board,myPosition);
+                return chess.MoveCalculators.KnightMoveCalc.getMoves(board,myPosition);
             case ROOK:
-                return RookMoveCalc.getMoves(board,myPosition);
+                return chess.MoveCalculators.RookMoveCalc.getMoves(board,myPosition);
             case PAWN:
-                return PawnMoveCalc.getMoves(board,myPosition);
-            default: new HashSet<>();
+                return chess.MoveCalculators.PawnMoveCalc.getMoves(board,myPosition);
+            default: return new HashSet<>();
         }
-        return null;
 
     }
     @Override
