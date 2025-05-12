@@ -1,5 +1,6 @@
 package chess;
 
+import javax.swing.*;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.ArrayList;
@@ -54,7 +55,54 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition)
     {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = board.getPiece(startPosition);
+        if (piece == null){return null;};
+
+        Collection<ChessMove> possibleMoves = piece.pieceMoves(board,startPosition);
+        Collection<ChessMove> validMoves = new ArrayList<>();
+
+        for (ChessMove move : possibleMoves)
+        {
+            ChessBoard altBoard = new ChessBoard();
+
+            copyBoard(board, altBoard);
+
+            makeTempMove(altBoard,move);
+
+            //make temp move to see if its valid
+                //its valid if the king is not in check
+        }
+
+        //function to see if the king is in check
+            //we'll have to know where the king is
+                //maybe loop through the board to find the king??
+
+
+
+            //make the move on this temproary board and see if the king is in check, if it is then this is not a valid move
+        return validMoves;
+    }
+
+    //function to create the alternate board that we will be working with.
+    //probably do a for loop and create the board to be a match.
+    private void copyBoard(ChessBoard sourceBoard, ChessBoard destBoard)
+    {
+        for (int row = 1; row <= 8; row ++)
+        {
+            for (int col = 1; col <= 8; col++)
+            {
+                ChessPosition position = new ChessPosition(row, col);
+                ChessPiece piece = sourceBoard.getPiece(position);
+                destBoard.addPiece(position,piece);
+            }
+        }
+    }
+
+    private void makeTempMove(ChessBoard board,ChessMove move)
+    {
+        ChessPiece piece = board.getPiece(move.getStartPosition());
+        board.addPiece(move.getEndPosition(),piece);
+        board.addPiece(move.getStartPosition(),null); //a workaround so that we don't need to make a removePiece method
     }
 
     /**
