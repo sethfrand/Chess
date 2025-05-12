@@ -6,6 +6,7 @@ import chess.ChessPiece;
 import chess.ChessPosition;
 import chess.ChessGame;
 
+import java.util.Collection;
 import java.util.HashSet;
 
 
@@ -14,7 +15,7 @@ public class PawnMoveCalc
 
     //Create check to see if position is valid. need to pass in the current row and column
     //update the current position
-    public static HashSet<chess.ChessMove> getMoves(chess.ChessBoard board, ChessPosition position) {
+    public static HashSet<ChessMove> getMoves(chess.ChessBoard board, ChessPosition position) {
         HashSet<ChessMove> validMove = new HashSet<>();
         ChessPiece piece = board.getPiece(position);
 
@@ -77,7 +78,6 @@ public class PawnMoveCalc
                         validMove.add(new ChessMove(position, capturePos, null));
                     }
                 }
-
             }
         }
         return validMove;

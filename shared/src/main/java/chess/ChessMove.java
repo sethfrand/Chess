@@ -37,7 +37,7 @@ private ChessPiece.PieceType promotionPiece;
     {
         return endPosition;
     }
-    /**
+    /*
      * Gets the type of piece to promote a pawn to if pawn promotion is part of this
      * chess move
      *

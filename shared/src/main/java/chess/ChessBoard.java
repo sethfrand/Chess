@@ -43,7 +43,6 @@ public class ChessBoard {
         int col = position.getColumn() - 1;
         //make sure that the board is 0 indexed for the check in "isValidMove"
 
-
         if (row < 0 || row >= 8 || col < 0 || col >=8)
         {
             return null;

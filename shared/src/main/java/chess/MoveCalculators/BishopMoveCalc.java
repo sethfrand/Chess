@@ -45,7 +45,8 @@ public class BishopMoveCalc {
                 //If the square that the piece wants to move to is empty, update the position
                 if (atDest == null) //this is a valid move
                 {
-                    validMove.add(new ChessMove(position,newPos,null));}
+                    validMove.add(new ChessMove(position,newPos,null));
+                }
                     else if(atDest.getTeamColor() != piece.getTeamColor())
                     {
                     validMove.add(new ChessMove(position, newPos, null));
@@ -58,13 +59,13 @@ public class BishopMoveCalc {
                 //incrementing the direction that we are moving
                 currRow += rowInc;
                 currCol+= colInc;
-                }
             }
+        }
         return validMove;
     }
     //create helper function that can check to see if the move is valid
     static boolean isValidMove(int row, int col)
     {
-        return row >= 1 && row <= 8 && col >= 1 && col <= 8;
+        return (row >= 1 && row <= 8 && col >= 1 && col <= 8);
     }
 }
