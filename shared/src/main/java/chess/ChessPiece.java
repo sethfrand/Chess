@@ -59,17 +59,17 @@ public class ChessPiece {
         switch(getPieceType())
         {
             case BISHOP:
-                return chess.moveCalculators.BishopMoveCalc.getMoves(board,myPosition);
+                return chess.movecalculators.BishopMoveCalc.getMoves(board,myPosition);
             case KING:
-                return chess.moveCalculators.KingMoveCalc.getMoves(board,myPosition);
+                return chess.movecalculators.KingMoveCalc.getMoves(board,myPosition);
             case QUEEN:
-                return chess.moveCalculators.QueenMoveCalc.getMoves(board,myPosition);
+                return chess.movecalculators.QueenMoveCalc.getMoves(board,myPosition);
             case KNIGHT:
-                return chess.moveCalculators.KnightMoveCalc.getMoves(board,myPosition);
+                return chess.movecalculators.KnightMoveCalc.getMoves(board,myPosition);
             case ROOK:
-                return chess.moveCalculators.RookMoveCalc.getMoves(board,myPosition);
+                return chess.movecalculators.RookMoveCalc.getMoves(board,myPosition);
             case PAWN:
-                return chess.moveCalculators.PawnMoveCalc.getMoves(board,myPosition);
+                return chess.movecalculators.PawnMoveCalc.getMoves(board,myPosition);
             default: return new HashSet<>();
         }
 

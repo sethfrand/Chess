@@ -1,4 +1,4 @@
-package chess.moveCalculators;
+package chess.movecalculators;
 
 import chess.ChessMove;
 import chess.ChessPiece;
@@ -7,7 +7,7 @@ import chess.ChessPosition;
 import java.util.HashSet;
 
 public class RookMoveCalc {
-    private static final int[][] directions =
+    private static final int[][] DIRECTIONS =
             {
                     //*from perspective of white
                     {1, 0}, // up/forward
@@ -25,7 +25,7 @@ public class RookMoveCalc {
             return validMove;
         }
 
-        for (int []direction : directions) // check all directions
+        for (int []direction : DIRECTIONS) // check all directions
         {
             int rowInc = direction[0];
             int colInc = direction[1];
