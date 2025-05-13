@@ -53,36 +53,73 @@ public class ChessGame {
      * @return Set of valid moves for requested piece, or null if no piece at
      * startPosition
      */
-    public Collection<ChessMove> validMoves(ChessPosition startPosition)
-    {
+    public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
-        if (piece == null){return null;};
+        if (piece == null) {
+            return null;
+        }
 
-        Collection<ChessMove> possibleMoves = piece.pieceMoves(board,startPosition);
+        Collection<ChessMove> possibleMoves = piece.pieceMoves(board, startPosition);
         Collection<ChessMove> validMoves = new ArrayList<>();
 
-        for (ChessMove move : possibleMoves)
-        {
+        for (ChessMove move : possibleMoves) {
             ChessBoard altBoard = new ChessBoard();
 
             copyBoard(board, altBoard);
 
-            makeTempMove(altBoard,move);
+            makeTempMove(altBoard, move);
 
             //make temp move to see if its valid
-                //its valid if the king is not in check
-        }
+            //its valid if the king is not in check
+            if (!kingCheck(altBoard, piece.getTeamColor())) {
+                validMoves.add(move);
+            }
 
-        //function to see if the king is in check
+            //function to see if the king is in check
             //we'll have to know where the king is
-                //maybe loop through the board to find the king??
-
-
+            //maybe loop through the board to find the king??
 
             //make the move on this temproary board and see if the king is in check, if it is then this is not a valid move
+        }
         return validMoves;
     }
+        private boolean kingCheck(ChessBoard board,TeamColor team)
+        {
+            ChessPosition position = kingPos(board,team);
 
+            for (int row = 1; row <= 8; row++) {
+                for (int col = 1; col <= 8; col++) {
+                    ChessPosition curPos = new ChessPosition(row, col);
+                    ChessPiece piece = board.getPiece(curPos);
+
+                    if (piece != null && piece.getTeamColor() != team) {
+                        HashSet<ChessMove> moves = piece.pieceMoves(board, curPos);
+                        for (ChessMove move : moves) {
+                            if (move.getEndPosition().equals(position)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+            private ChessPosition kingPos (ChessBoard board, TeamColor team)
+            {
+                for (int row = 1; row <= 8; row++) {
+                    for (int col = 1; col <= 8; col++) {
+                        ChessPosition newPosition = new ChessPosition(row, col);
+                        ChessPiece piece = board.getPiece(newPosition);
+                        // check to see if it is the king and the right colour
+                        if (piece != null && piece.getTeamColor() == team && piece.getPieceType() == ChessPiece.PieceType.KING)
+                        {return newPosition;
+                    }
+                }
+            }
+                return null;
+        }
     //function to create the alternate board that we will be working with.
     //probably do a for loop and create the board to be a match.
     private void copyBoard(ChessBoard sourceBoard, ChessBoard destBoard)
