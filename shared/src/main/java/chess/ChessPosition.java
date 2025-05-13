@@ -51,7 +51,7 @@ public class ChessPosition {
             return false;
         }
         ChessPosition position = (ChessPosition) obj;
-        if (row != position.row) return false;
+        if (row != position.row) {return false;}
         return col == position.col;
     }
 }

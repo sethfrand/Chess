@@ -202,16 +202,17 @@ public class ChessGame {
                     break;
                 }
             }
-            if (kingPos != null) break;
-        }
-        TeamColor OppoColor = (teamColor == teamColor.WHITE) ? teamColor.BLACK:teamColor.WHITE; //checking to see if the king can be attacked by any opposing pieces
+            if (kingPos != null) {break;}
+
+        }//checking to see if the king can be attacked by any opposing pieces
+        TeamColor oppoColor = (teamColor == teamColor.WHITE) ? teamColor.BLACK:teamColor.WHITE;
         for (int row = 1; row <= 8; row++)
         {
             for (int col =1; col <= 8; col++)
             {
                 ChessPosition position = new ChessPosition(row, col);
                 ChessPiece piece = board.getPiece(position);
-                if (piece != null && piece.getTeamColor() == OppoColor)
+                if (piece != null && piece.getTeamColor() == oppoColor)
                 {
                     Collection<ChessMove>moves = piece.pieceMoves(board,position);
                     for (ChessMove move : moves)
@@ -235,7 +236,7 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor)
     {
-        if (!isInCheck(teamColor)) return false;
+        if (!isInCheck(teamColor)) {return false;}
         for (int row = 1; row <= 8; row++)
         {
             for (int col = 1; col <=8; col++)

@@ -1,10 +1,6 @@
 package chess;
 
-import chess.MoveCalculators.*;
-
 import java.util.HashSet;
-
-import java.util.Collection;
 
 /**
  * Represents a single chess piece
@@ -63,17 +59,17 @@ public class ChessPiece {
         switch(getPieceType())
         {
             case BISHOP:
-                return chess.MoveCalculators.BishopMoveCalc.getMoves(board,myPosition);
+                return chess.moveCalculators.BishopMoveCalc.getMoves(board,myPosition);
             case KING:
-                return chess.MoveCalculators.KingMoveCalc.getMoves(board,myPosition);
+                return chess.moveCalculators.KingMoveCalc.getMoves(board,myPosition);
             case QUEEN:
-                return chess.MoveCalculators.QueenMoveCalc.getMoves(board,myPosition);
+                return chess.moveCalculators.QueenMoveCalc.getMoves(board,myPosition);
             case KNIGHT:
-                return chess.MoveCalculators.KnightMoveCalc.getMoves(board,myPosition);
+                return chess.moveCalculators.KnightMoveCalc.getMoves(board,myPosition);
             case ROOK:
-                return chess.MoveCalculators.RookMoveCalc.getMoves(board,myPosition);
+                return chess.moveCalculators.RookMoveCalc.getMoves(board,myPosition);
             case PAWN:
-                return chess.MoveCalculators.PawnMoveCalc.getMoves(board,myPosition);
+                return chess.moveCalculators.PawnMoveCalc.getMoves(board,myPosition);
             default: return new HashSet<>();
         }
 
@@ -107,7 +103,7 @@ public class ChessPiece {
             return false;
         }
         ChessPiece piece = (ChessPiece) obj;
-        if (team != piece.team) return false;
+        if (team != piece.team) {return false;}
         return type == piece.type;
 
 

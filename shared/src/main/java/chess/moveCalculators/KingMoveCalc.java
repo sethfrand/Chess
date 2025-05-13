@@ -1,7 +1,6 @@
-package chess.MoveCalculators;
+package chess.moveCalculators;
 
 import chess.ChessMove;
-import chess.ChessBoard;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
@@ -9,7 +8,7 @@ import java.util.HashSet;
 
 public class KingMoveCalc
 {
-    private static final int[][] Directions =
+    private static final int[][] directions =
             {
                     //*from perspective of white
                     {1,0}, // up/forward
@@ -28,7 +27,7 @@ public class KingMoveCalc
         if (piece == null) {
             return validMove;
         }
-        for (int[] direction : Directions) // check all possible moves
+        for (int[] direction : directions) // check all possible moves
         {
             int rowInc = direction[0];
             int colInc = direction[1];

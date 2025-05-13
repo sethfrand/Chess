@@ -69,8 +69,8 @@ private ChessPiece.PieceType promotionPiece;
         }
         ChessMove move = (ChessMove) obj;
 
-        if (!startPosition.equals(move.startPosition)) return false;
-        if (!endPosition.equals(move.endPosition)) return false;
+        if (!startPosition.equals(move.startPosition)) {return false;}
+        if (!endPosition.equals(move.endPosition)) {return false;}
         if (promotionPiece == null)
         {
             return move.promotionPiece == null;

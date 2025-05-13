@@ -1,14 +1,13 @@
-package chess.MoveCalculators;
+package chess.moveCalculators;
 
 import chess.ChessMove;
-import chess.ChessBoard;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
 import java.util.HashSet;
 
 public class QueenMoveCalc {
-    private static final int[][] Directions =
+    private static final int[][] directions =
             {
                     //*from perspective of white
                     {1, 0}, // up/forward
@@ -30,7 +29,7 @@ public class QueenMoveCalc {
             return validMove;
         }
 
-        for (int []direction : Directions) // check all directions
+        for (int []direction : directions) // check all directions
         {
             int rowInc = direction[0];
             int colInc = direction[1];

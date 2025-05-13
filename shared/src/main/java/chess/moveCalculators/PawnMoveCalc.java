@@ -1,12 +1,10 @@
-package chess.MoveCalculators;
+package chess.moveCalculators;
 
 import chess.ChessMove;
-import chess.ChessBoard;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import chess.ChessGame;
 
-import java.util.Collection;
 import java.util.HashSet;
 
 
