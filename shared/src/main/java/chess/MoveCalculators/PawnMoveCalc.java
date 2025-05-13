@@ -91,7 +91,7 @@ public class PawnMoveCalc
             moves.add(new ChessMove(start, end, ChessPiece.PieceType.KNIGHT));
 
         }
-
+    //create helper function that can check to see if the move is valid
         static boolean isValidMove(int row, int col)
         {
             return row >= 1 && row <= 8 && col >= 1 && col <= 8;
