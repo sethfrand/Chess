@@ -23,7 +23,8 @@ public class PawnMoveCalc
         }
 
 
-        //check for team color to determine how the pawn will move,where it will start, and where it promotes as the others are assuming white, assume white
+        //check for team color to determine how the pawn will move,where it will start,
+        // and where it promotes as the others are assuming white, assume white
         int forwardMovement = (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? 1 : -1;
         int startRow = (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? 2 : 7;
         int promoRow = (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? 8 : 1;
