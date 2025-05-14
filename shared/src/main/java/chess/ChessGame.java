@@ -96,9 +96,7 @@ public class ChessGame {
                     if (piece != null && piece.getTeamColor() != team) {
                         HashSet<ChessMove> moves = piece.pieceMoves(board, curPos);
                         for (ChessMove move : moves) {
-                            if (move.getEndPosition().equals(position)) {
-                                return true;
-                            }
+                            if (move.getEndPosition().equals(position)) {return true;}
                         }
                     }
                 }
