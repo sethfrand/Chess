@@ -65,6 +65,6 @@ public class BishopMoveCalc {
     //helper function that can check to see if the move is valid
     static boolean isValidMove(int row, int col)
     {
-        return (row >= 1 && row <= 8 && col >= 1 && col <= 8);
+        return MoveCalculator.isValidMove(row, col);
     }
 }
