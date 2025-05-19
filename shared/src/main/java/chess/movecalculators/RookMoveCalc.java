@@ -15,17 +15,17 @@ public class RookMoveCalc {
                     {0, -1}, // left
                     {-1, 0}, // down/backward
             };
-    public static HashSet<chess.ChessMove>getMoves(chess.ChessBoard board, ChessPosition position)
-    {
-        HashSet<ChessMove> validMove = new HashSet<>();
-        ChessPiece piece  = board.getPiece(position);
 
-        if(piece == null) // base case for if the piece isnt there
+    public static HashSet<chess.ChessMove> getMoves(chess.ChessBoard board, ChessPosition position) {
+        HashSet<ChessMove> validMove = new HashSet<>();
+        ChessPiece piece = board.getPiece(position);
+
+        if (piece == null) // base case for if the piece isnt there
         {
             return validMove;
         }
 
-        for (int []direction : DIRECTIONS) // check all directions
+        for (int[] direction : DIRECTIONS) // check all directions
         {
             int rowInc = direction[0];
             int colInc = direction[1];
@@ -34,7 +34,7 @@ public class RookMoveCalc {
             int currRow = position.getRow() + rowInc;
             int currCol = position.getColumn() + colInc;
 
-            while(isValidMove(currRow,currCol)) //can move more than one space
+            while (isValidMove(currRow, currCol)) //can move more than one space
             {
                 ChessPosition newPos = new ChessPosition(currRow, currCol);
                 ChessPiece atDest = board.getPiece(newPos);
@@ -42,26 +42,23 @@ public class RookMoveCalc {
                 //If the square that the piece wants to move to is empty, update the position
                 if (atDest == null) //this is a valid move
                 {
-                    validMove.add(new ChessMove(position,newPos,null));}
-                else if(atDest.getTeamColor() != piece.getTeamColor())
-                {
+                    validMove.add(new ChessMove(position, newPos, null));
+                } else if (atDest.getTeamColor() != piece.getTeamColor()) {
                     validMove.add(new ChessMove(position, newPos, null));
                     break;
-                }
-                else
-                {
+                } else {
                     break; //else the move is invalid
                 }
                 //incrementing the direction that we are moving
                 currRow += rowInc;
-                currCol+= colInc;
+                currCol += colInc;
             }
         }
         return validMove;
     }
+
     //helper function that can check to see if the move is valid
-    static boolean isValidMove(int row, int col)
-    {
+    static boolean isValidMove(int row, int col) {
         return row >= 1 && row <= 8 && col >= 1 && col <= 8;
     }
 }

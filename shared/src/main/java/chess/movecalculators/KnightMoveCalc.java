@@ -11,16 +11,17 @@ public class KnightMoveCalc {
             {
                     //*from perspective of white
                     {2, 1}, // up 2 right 1
-                    {1,2}, //  up 1 right 2
+                    {1, 2}, //  up 1 right 2
                     {-1, 2}, // down 1 right 2
-                    {-2,1}, //down 2 right 1
+                    {-2, 1}, //down 2 right 1
 
-                    {-2,-1}, // down 2 left 1
+                    {-2, -1}, // down 2 left 1
                     {-1, -2}, // down 1 left 2
-                    {1,-2}, // up 1 left 2
-                    {2,-1} //down 2, left 1
+                    {1, -2}, // up 1 left 2
+                    {2, -1} //down 2, left 1
             };
-    public static HashSet<chess.ChessMove>getMoves(chess.ChessBoard board, ChessPosition position) {
+
+    public static HashSet<chess.ChessMove> getMoves(chess.ChessBoard board, ChessPosition position) {
         HashSet<ChessMove> validMove = new HashSet<>();
         ChessPiece piece = board.getPiece(position);
 
@@ -50,8 +51,8 @@ public class KnightMoveCalc {
         }
         return validMove;
     }//helper function that can check to see if the move is valid
-    static boolean isValidMove(int row, int col)
-    {
+
+    static boolean isValidMove(int row, int col) {
         return row >= 1 && row <= 8 && col >= 1 && col <= 8;
     }
 }

@@ -8,8 +8,7 @@ import chess.ChessGame;
 import java.util.HashSet;
 
 
-public class PawnMoveCalc
-{
+public class PawnMoveCalc {
 
     //Create check to see if position is valid. need to pass in the current row and column
     //update the current position
@@ -81,18 +80,18 @@ public class PawnMoveCalc
         }
         return validMove;
     }
-        // all promotion pieces
-        static void addPromoMoves(HashSet<ChessMove>moves, ChessPosition start, ChessPosition end)
-        {
-            moves.add(new ChessMove(start,end,ChessPiece.PieceType.QUEEN));
-            moves.add(new ChessMove(start,end, ChessPiece.PieceType.ROOK));
-            moves.add(new ChessMove(start, end,ChessPiece.PieceType.BISHOP));
-            moves.add(new ChessMove(start, end, ChessPiece.PieceType.KNIGHT));
 
-        }
+    // all promotion pieces
+    static void addPromoMoves(HashSet<ChessMove> moves, ChessPosition start, ChessPosition end) {
+        moves.add(new ChessMove(start, end, ChessPiece.PieceType.QUEEN));
+        moves.add(new ChessMove(start, end, ChessPiece.PieceType.ROOK));
+        moves.add(new ChessMove(start, end, ChessPiece.PieceType.BISHOP));
+        moves.add(new ChessMove(start, end, ChessPiece.PieceType.KNIGHT));
+
+    }
+
     //create helper function that can check to see if the move is valid
-        static boolean isValidMove(int row, int col)
-        {
-            return row >= 1 && row <= 8 && col >= 1 && col <= 8;
-        }
+    static boolean isValidMove(int row, int col) {
+        return row >= 1 && row <= 8 && col >= 1 && col <= 8;
+    }
 }

@@ -34,16 +34,14 @@ public class ChessPiece {
     /**
      * @return Which team this chess piece belongs to
      */
-    public ChessGame.TeamColor getTeamColor()
-    {
+    public ChessGame.TeamColor getTeamColor() {
         return team;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
-    public PieceType getPieceType()
-    {
+    public PieceType getPieceType() {
         return type;
     }
 
@@ -54,31 +52,29 @@ public class ChessPiece {
      *
      * @return Collection of valid moves
      */
-    public HashSet<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition)
-    {
-        switch(getPieceType())
-        {
+    public HashSet<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        switch (getPieceType()) {
             case BISHOP:
-                return chess.movecalculators.BishopMoveCalc.getMoves(board,myPosition);
+                return chess.movecalculators.BishopMoveCalc.getMoves(board, myPosition);
             case KING:
-                return chess.movecalculators.KingMoveCalc.getMoves(board,myPosition);
+                return chess.movecalculators.KingMoveCalc.getMoves(board, myPosition);
             case QUEEN:
-                return chess.movecalculators.QueenMoveCalc.getMoves(board,myPosition);
+                return chess.movecalculators.QueenMoveCalc.getMoves(board, myPosition);
             case KNIGHT:
-                return chess.movecalculators.KnightMoveCalc.getMoves(board,myPosition);
+                return chess.movecalculators.KnightMoveCalc.getMoves(board, myPosition);
             case ROOK:
-                return chess.movecalculators.RookMoveCalc.getMoves(board,myPosition);
+                return chess.movecalculators.RookMoveCalc.getMoves(board, myPosition);
             case PAWN:
-                return chess.movecalculators.PawnMoveCalc.getMoves(board,myPosition);
-            default: return new HashSet<>();
+                return chess.movecalculators.PawnMoveCalc.getMoves(board, myPosition);
+            default:
+                return new HashSet<>();
         }
 
     }
+
     @Override
-    public String toString()
-    {
-        return switch (type)
-        {
+    public String toString() {
+        return switch (type) {
             case KING -> team == ChessGame.TeamColor.WHITE ? "K" : "k";
             case QUEEN -> team == ChessGame.TeamColor.WHITE ? "Q" : "q";
             case KNIGHT -> team == ChessGame.TeamColor.WHITE ? "N" : "n";
@@ -97,13 +93,16 @@ public class ChessPiece {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {return false;}
-        if (obj == null || getClass() != obj.getClass())
-        {
+        if (this == obj) {
+            return false;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
         ChessPiece piece = (ChessPiece) obj;
-        if (team != piece.team) {return false;}
+        if (team != piece.team) {
+            return false;
+        }
         return type == piece.type;
 
 
