@@ -1,16 +1,34 @@
 package handler;
 
 import com.google.gson.Gson;
+import service.AuthService;
+import service.GameService;
 import spark.Request;
 import spark.Response;
 
+import java.util.Collection;
+
 public class GameHandler {
     private final Gson gson = new Gson();
+    private final GameService gameService = new GameService();
+    private final AuthService authService = new AuthService();
 
 
     public Object getGames(Request request, Response response) {
-        response.status(200);
-        return gson.toJson(new ListGamesResponse());
+        String authToken = request.headers("authorization");
+
+        if (authToken == null || authToken.isEmpty()) {
+            response.status(401);
+            return gson.toJson(new ErrorResponse("Error: bad request"));
+
+        }
+        String username = authService.getUsernameForToken(authToken);
+        if (username == null) {
+            response.status(401);
+            return gson.toJson(new ErrorResponse("Error: unauthorzied"));
+        }
+        Collection<GameData> games = gameService.listGames();
+        
     }
 
     public Object joinGame(Request request, Response response) {

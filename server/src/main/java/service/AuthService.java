@@ -23,4 +23,12 @@ public class AuthService {
         return AuthDAO.DeleteAuth(token);
     }
 
+    public String getUsernameForToken(String token) {
+        return authDAO.getUserName(token);
+    }
+
+    public void clear() {
+        authDAO.clear();
+    }
+
 }
