@@ -7,7 +7,7 @@ import model.UserData;
 
 public class UserDAO {
 
-    private final Map<String, UserData> users = new HashMap<>();
+    private static final Map<String, UserData> users = new HashMap<>();
 
     public void createUser(UserData user) {
         users.put(user.getUserName(), user);

@@ -2,6 +2,7 @@ package service;
 
 
 import dataAccess.UserDAO;
+import dataAccess.AuthDAO;
 import model.AuthData;
 import model.UserData;
 
@@ -11,7 +12,7 @@ public class AuthService {
 
     public AuthData login(String username, String password) {
         UserData user = UserDAO.getUser(username);
-        if (user == null || user.getPassword().equals(password)) {
+        if (user == null || !user.getPassword().equals(password)) {
             return null;
         }
         return AuthDAO.createAuth(username);
@@ -19,7 +20,7 @@ public class AuthService {
     }
 
     public boolean logout(String token) {
-        return AuthDAO.deleteAuth(token);
+        return AuthDAO.DeleteAuth(token);
     }
 
 }
