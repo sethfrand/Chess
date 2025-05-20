@@ -1,16 +1,20 @@
 package service;
 
+
+import dataAccess.UserDAO;
+import model.AuthData;
+import model.UserData;
+
 public class AuthService {
-    private final UserDAO userDAO = new UserDAO;
-    private final AuthDAO authDAO = new AuthDAO;
+    private final UserDAO userDAO = new UserDAO();
+    private final AuthDAO authDAO = new AuthDAO();
 
     public AuthData login(String username, String password) {
         UserData user = UserDAO.getUser(username);
-        if (user == null || user.getPassword.equals(password)) {
+        if (user == null || user.getPassword().equals(password)) {
             return null;
         }
-        AuthData auth = AuthDAO.createAuth(username);
-        return auth;
+        return AuthDAO.createAuth(username);
 
     }
 

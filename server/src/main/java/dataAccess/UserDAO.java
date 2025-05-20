@@ -1,16 +1,19 @@
 package dataAccess;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import model.UserData;
 
 public class UserDAO {
 
-    private final Collection<String, UserData> users = new Collection<>();
+    private final Map<String, UserData> users = new HashMap<>();
 
     public void createUser(UserData user) {
-        users.put(user.getUsername(), user);
+        users.put(user.getUserName(), user);
     }
 
-    public UserData getUser(String userName) {
+    public static UserData getUser(String userName) {
         return users.get(userName);
     }
 
