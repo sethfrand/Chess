@@ -3,6 +3,7 @@ package handler;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import model.AuthData;
+import model.UserData;
 import spark.*;
 import service.AuthService;
 
@@ -11,6 +12,10 @@ public class UserHandler {
     private final AuthService authService = new AuthService();
 
     public Object register(Request request, Response response) {
+
+        UserData user = new UserData();
+        UserData.setUserName = (RegisterRequeset.username);
+        UserData.
         try {
             RegisterRequeset registerRequest = gson.fromJson(request.body(), RegisterRequeset.class);
             response.status(200);
