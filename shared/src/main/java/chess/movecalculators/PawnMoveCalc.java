@@ -21,7 +21,6 @@ public class PawnMoveCalc {
             return validMove;
         }
 
-
         //check for team color to determine how the pawn will move,where it will start,
         // and where it promotes as the others are assuming white, assume white
         int forwardMovement = (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? 1 : -1;
@@ -31,54 +30,80 @@ public class PawnMoveCalc {
         int currRow = position.getRow();
         int currCol = position.getColumn();
 
-        //if the pawn wants to move one row
+        addForwardMoves(board, validMove, position, currRow, currCol, forwardMovement, startRow, promoRow);
+
+        addCaptureMoves(board, validMove, position, piece, currRow, currCol, forwardMovement, promoRow);
+
+        return validMove;
+    }
+
+    private static void addForwardMoves(chess.ChessBoard board, HashSet<ChessMove> validMove,
+                                        ChessPosition position, int currRow, int currCol,
+                                        int forwardMovement, int startRow, int promoRow) {
+        // One square forward move
         int newRow = currRow + forwardMovement;
+
         if (isValidMove(newRow, currCol)) {
             ChessPosition newPos = new ChessPosition(newRow, currCol);
             ChessPiece atDest = board.getPiece(newPos);
-            if (atDest == null) //check to see if the space is empty
-            {
+
+            if (atDest == null) { // Check if the space is empty
+                // Handle promotion if reached promotion row
                 if (newRow == promoRow) {
                     addPromoMoves(validMove, position, newPos);
                 } else {
                     validMove.add(new ChessMove(position, newPos, null));
-                }
-                // check to see if the pawn can go another square (2 square initial move.)
-                if (currRow == startRow) {
-                    int twoSquareMove = currRow + (2 * forwardMovement);
-                    if (isValidMove(twoSquareMove, currCol)) {
-                        ChessPosition twoSquarePos = new ChessPosition(twoSquareMove, currCol);
-                        if (board.getPiece(twoSquarePos) == null) {
-                            validMove.add(new ChessMove(position, twoSquarePos, null));
-                        }
-                    }
+
+                    // Handle two square move if it is possible
+                    addTwoSquareMove(board, validMove, position, currRow, currCol, forwardMovement, startRow);
                 }
             }
         }
+    }
 
-        //capturing pieces, this will have similar logic to the bishop
-        for (int adjCol : new int[]{1, -1}) //checking both adjacent columns of the pawn to see if there is a piece to capture
-        {
+    private static void addTwoSquareMove(chess.ChessBoard board, HashSet<ChessMove> validMove,
+                                         ChessPosition position, int currRow, int currCol,
+                                         int forwardMovement, int startRow) {
+        if (currRow == startRow) {
+            int twoSquareMove = currRow + (2 * forwardMovement);
+
+            if (isValidMove(twoSquareMove, currCol)) {
+                ChessPosition twoSquarePos = new ChessPosition(twoSquareMove, currCol);
+
+                if (board.getPiece(twoSquarePos) == null) {
+                    validMove.add(new ChessMove(position, twoSquarePos, null));
+                }
+            }
+        }
+    }
+
+    /**
+     * Add all possible capture moves for a pawn
+     */
+    private static void addCaptureMoves(chess.ChessBoard board, HashSet<ChessMove> validMove,
+                                        ChessPosition position, ChessPiece piece,
+                                        int currRow, int currCol, int forwardMovement, int promoRow) {
+        // Check both diagonal captures (left and right)
+        for (int adjCol : new int[]{1, -1}) {
             int captureRow = currRow + forwardMovement;
             int captureCol = currCol + adjCol;
 
-            //check to see if the move is valid first and then see if you can capture
-            if (isValidMove(captureRow, captureCol)) {
-                ChessPosition capturePos = new ChessPosition(captureRow, captureCol);
-                ChessPiece capturePiece = board.getPiece(capturePos); //piece is captured at this position
+            if (!isValidMove(captureRow, captureCol)) {
+                continue;
+            }
 
-                if (capturePiece != null && capturePiece.getTeamColor() != piece.getTeamColor()) //make sure isnt same colour
-                {
-                    //check for promotion
-                    if (captureRow == promoRow) {
-                        addPromoMoves(validMove, position, capturePos);
-                    } else {
-                        validMove.add(new ChessMove(position, capturePos, null));
-                    }
-                }
+            ChessPosition capturePos = new ChessPosition(captureRow, captureCol);
+            ChessPiece capturePiece = board.getPiece(capturePos);
+
+            if (capturePiece == null || capturePiece.getTeamColor() == piece.getTeamColor()) {
+                continue;
+            }
+            if (captureRow == promoRow) {
+                addPromoMoves(validMove, position, capturePos);
+            } else {
+                validMove.add(new ChessMove(position, capturePos, null));
             }
         }
-        return validMove;
     }
 
     // all promotion pieces
@@ -87,7 +112,6 @@ public class PawnMoveCalc {
         moves.add(new ChessMove(start, end, ChessPiece.PieceType.ROOK));
         moves.add(new ChessMove(start, end, ChessPiece.PieceType.BISHOP));
         moves.add(new ChessMove(start, end, ChessPiece.PieceType.KNIGHT));
-
     }
 
     //create helper function that can check to see if the move is valid
