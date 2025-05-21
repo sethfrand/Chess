@@ -64,22 +64,28 @@ public class UserHandler {
 
 
     public Object login(Request request, Response response) {
-        LoginRequest loginRequest = gson.fromJson(request.body(), LoginRequest.class);
-        AuthData authdata = authService.login(loginRequest.username, loginRequest.password);
+        try {
+            LoginRequest loginRequest = gson.fromJson(request.body(), LoginRequest.class);
 
-        if (loginRequest.username == null || loginRequest.password == null) {
+            if (loginRequest == null || loginRequest.username == null || loginRequest.password == null) {
+                response.status(400);
+                return gson.toJson(new ErrorResponse("Error: bad request"));
+            }
+
+            AuthData authdata = authService.login(loginRequest.username, loginRequest.password);
+
+            if (authdata == null) {
+                response.status(401);
+                return gson.toJson(new ErrorResponse("Error: unauthorized"));
+            }
+
+            response.status(200);
+            response.type("application/json");
+            return gson.toJson(authdata);
+        } catch (Exception e) {
             response.status(400);
             return gson.toJson(new ErrorResponse("Error: bad request"));
         }
-
-        if (authdata == null) {
-            response.status(401);
-            return gson.toJson(new ErrorResponse("Error: unauthorized"));
-        }
-
-        response.status(200);
-        response.type("application/json");
-        return gson.toJson(authdata);
     }
 
     public Object logout(Request request, Response response) {
@@ -132,6 +138,7 @@ public class UserHandler {
     private static class LoginRequest {
         String username;
         String password;
+        String email;
     }
 
     private static class RegisterRequest {
