@@ -1,14 +1,12 @@
-package server;
+package passoff.server;
 
 import chess.ChessGame;
 import org.junit.jupiter.api.*;
 import passoff.model.*;
-import passoff.server.TestServerFacade;
+import server.Server;
 
 import java.net.HttpURLConnection;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Locale;
+import java.util.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class StandardAPITests {
@@ -79,9 +77,8 @@ public class StandardAPITests {
     @DisplayName("Login Bad Request")
     public void loginBadRequest() {
         TestUser[] incompleteLoginRequests = {
-            new TestUser(null, existingUser.getPassword(), existingUser.getEmail()),
-            new TestUser(existingUser.getUsername(), null, existingUser.getEmail()),
-            new TestUser(existingUser.getUsername(), existingUser.getPassword(), null),
+                new TestUser(null, existingUser.getPassword(), existingUser.getEmail()),
+                new TestUser(existingUser.getUsername(), null, existingUser.getEmail()),
         };
 
         for (TestUser incompleteLoginRequest : incompleteLoginRequests) {
@@ -96,7 +93,7 @@ public class StandardAPITests {
     @Order(3)
     @DisplayName("Login Unauthorized (Multiple Forms)")
     public void loginUnauthorized() {
-        TestUser[] unauthorizedLoginRequests = { newUser, new TestUser(existingUser.getUsername(), "BAD!PASSWORD") };
+        TestUser[] unauthorizedLoginRequests = {newUser, new TestUser(existingUser.getUsername(), "BAD!PASSWORD")};
 
         for (TestUser unauthorizedLoginRequest : unauthorizedLoginRequests) {
             TestAuthResult loginResult = serverFacade.login(unauthorizedLoginRequest);
@@ -246,7 +243,7 @@ public class StandardAPITests {
         int gameID = createResult.getGameID();
 
         //If you use deserialize to the TeamColor enum instead of a String each of these will be read as null
-        for(String color : new String[]{null, "", "GREEN"}) {
+        for (String color : new String[]{null, "", "GREEN"}) {
             assertHttpBadRequest(serverFacade.joinPlayer(new TestJoinRequest(color, gameID), existingAuth));
         }
     }
