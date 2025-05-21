@@ -2,8 +2,7 @@ package handler;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
-import dataAccess.DataAccessException;
+import dataaccess.DataAccessException;
 import model.AuthData;
 import model.UserData;
 import service.GameService;
@@ -11,7 +10,6 @@ import spark.*;
 import service.AuthService;
 import service.UserService;
 
-import java.util.Map;
 import java.util.Set;
 
 public class UserHandler {
@@ -51,17 +49,28 @@ public class UserHandler {
 
     public Object login(Request request, Response response) {
         try {
-            LoginRequest loginRequest = gson.fromJson(request.body(), LoginRequest.class);
-
-            // Check if the loginRequest is null or has null/empty fields
-            if (loginRequest == null || loginRequest.username == null || loginRequest.password == null ||
-                    loginRequest.username.trim().isEmpty() || loginRequest.password.trim().isEmpty()) {
+            JsonObject loginRequestJson = gson.fromJson(request.body(), JsonObject.class);
+            if (loginRequestJson == null) {
                 response.status(400);
                 return gson.toJson(new ErrorResponse("Error: bad request"));
             }
 
-            AuthData authData = authService.login(loginRequest.username, loginRequest.password);
+            // Ensure only "username" and "password" fields are present
+            Set<String> keys = loginRequestJson.keySet();
+            if (!keys.equals(Set.of("username", "password"))) {
+                response.status(400);
+                return gson.toJson(new ErrorResponse("Error: bad request"));
+            }
 
+            String username = loginRequestJson.has("username") ? loginRequestJson.get("username").getAsString() : null;
+            String password = loginRequestJson.has("password") ? loginRequestJson.get("password").getAsString() : null;
+
+            if (username == null || password == null || username.trim().isEmpty() || password.trim().isEmpty()) {
+                response.status(400);
+                return gson.toJson(new ErrorResponse("Error: bad request"));
+            }
+
+            AuthData authData = authService.login(username, password);
             if (authData == null) {
                 response.status(401);
                 return gson.toJson(new ErrorResponse("Error: unauthorized"));
@@ -69,12 +78,9 @@ public class UserHandler {
 
             response.status(200);
             return gson.toJson(authData);
-        } catch (JsonSyntaxException e) {
+        } catch (Exception e) {
             response.status(400);
             return gson.toJson(new ErrorResponse("Error: bad request"));
-        } catch (Exception e) {
-            response.status(500);
-            return gson.toJson(new ErrorResponse("Error: server error"));
         }
     }
 

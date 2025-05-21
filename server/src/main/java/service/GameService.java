@@ -1,6 +1,6 @@
 package service;
 
-import dataAccess.GameDAO;
+import dataaccess.GameDAO;
 import model.GameData;
 
 import java.util.Collection;
@@ -29,6 +29,7 @@ public class GameService {
 
             if (!playerColor.equals("WHITE") && !playerColor.equals("BLACK")) {
                 throw new Exception("Invalid player color");
+
             }
 
             return gameDAO.takeColor(gameID, username, playerColor);

@@ -53,7 +53,8 @@ public class GameHandler {
 //                return gson.toJson(new ErrorResponse("Error: bad request"));
             JsonObject joinJsonRequest = gson.fromJson(request.body(), JsonObject.class);
 
-            if (joinJsonRequest == null || !joinJsonRequest.has("gameID")) {
+            if (joinJsonRequest == null || !joinJsonRequest.has("gameID")
+                    || !joinJsonRequest.has("playerColor")) {
                 response.status(400);
                 return gson.toJson(new ErrorResponse("Error: bad request"));
             }
