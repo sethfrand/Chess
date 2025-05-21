@@ -18,7 +18,7 @@ public class GameDAO {
     }
 
     public int createGame(String gameName) {
-        int gameID = nextID += 1;
+        int gameID = nextID++;
         ChessGame game = new ChessGame();
         GameData gameData = new GameData(gameID, null, null, gameName, game);
         games.put(gameID, gameData);
@@ -30,11 +30,11 @@ public class GameDAO {
         return games.values();
     }
 
-    public GameData getGame(String gameID) {
+    public GameData getGame(int gameID) {
         return games.get(gameID);
     }
 
-    public boolean takeColor(String gameID, String username, String playerColor) {
+    public boolean takeColor(int gameID, String username, String playerColor) {
         GameData gameData = games.get(gameID);
         if (gameData == null) {
             return false;

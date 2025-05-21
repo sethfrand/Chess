@@ -58,7 +58,7 @@ public class GameHandler {
                 response.status(200);
                 return "";
             } else {
-                response.status(400);
+                response.status(403);
                 return gson.toJson(new ErrorResponse("Error: already taken"));
             }
         } catch (Exception e) {

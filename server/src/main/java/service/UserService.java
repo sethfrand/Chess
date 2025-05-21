@@ -15,12 +15,13 @@ public class UserService {
     }
 
     public AuthData register(UserData user) throws DataAccessException {
+
         if (user == null || user.getUserName() == null || user.getUserName().isEmpty()) {
             throw new DataAccessException("Invalid user data");
         }
 
         if (userDAO.getUser(user.getUserName()) != null) {
-            throw new DataAccessException("User already exists");
+            return null;
         }
 
         userDAO.createUser(user);

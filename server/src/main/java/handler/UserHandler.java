@@ -139,7 +139,6 @@ public class UserHandler {
     private static class LoginRequest {
         String username;
         String password;
-        String email;
     }
 
     private static class RegisterRequest {
