@@ -15,12 +15,15 @@ public class AuthService {
         if (user == null || !user.getPassword().equals(password)) {
             return null;
         }
-        return AuthDAO.createAuth(username);
+        //return AuthDAO.createAuth(username);
+        return authDAO.createAuth(username);
+
 
     }
 
     public boolean logout(String token) {
-        return AuthDAO.DeleteAuth(token);
+        //return AuthDAO.DeleteAuth(token);
+        return AuthDAO.deleteAuth(token);
     }
 
     public String getUsernameForToken(String token) {

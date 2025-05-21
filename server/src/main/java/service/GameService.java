@@ -17,20 +17,24 @@ public class GameService {
     }
 
     public boolean joinGame(String gameIDstr, String username, String playerColor) throws Exception {
-        int gameID = Integer.parseInt(gameIDstr);
-        GameData game = gameDAO.getGame(gameID);
-        if (game == null) {
-            throw new Exception("Game not found");
-        }
-        if (playerColor == null) {
-            return true; // this means that there is no player associated with the desired colour
-        }
+        try {
+            int gameID = Integer.parseInt(gameIDstr);
+            GameData game = gameDAO.getGame(gameID);
+            if (game == null) {
+                throw new Exception("Game not found");
+            }
+            if (playerColor == null) {
+                return true; // this means that there is no player associated with the desired color
+            }
 
-        if (!playerColor.equals("WHITE") && !playerColor.equals("BLACK")) {
-            throw new Exception("Invalid player colour");
+            if (!playerColor.equals("WHITE") && !playerColor.equals("BLACK")) {
+                throw new Exception("Invalid player color");
+            }
+
+            return gameDAO.takeColor(gameID, username, playerColor);
+        } catch (NumberFormatException e) {
+            throw new Exception("Invalid game ID format");
         }
-        
-        return gameDAO.takeColor(gameID, username, playerColor);
     }
 
     public void clear() {

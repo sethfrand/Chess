@@ -9,7 +9,7 @@ import java.util.UUID;
 public class AuthDAO {
     private static final Map<String, String> authTokens = new HashMap<>();
 
-    public static AuthData createAuth(String username) {
+    public AuthData createAuth(String username) {
         String authToken = UUID.randomUUID().toString();
         //this will create the random string to be the auth token
         authTokens.put(authToken, username);
@@ -20,7 +20,7 @@ public class AuthDAO {
         return authTokens.get(authToken);
     }
 
-    public static Boolean DeleteAuth(String authToken) {
+    public static Boolean deleteAuth(String authToken) {
         if (authTokens.containsKey(authToken)) {
             authTokens.remove(authToken);
             return true;
@@ -32,8 +32,4 @@ public class AuthDAO {
         authTokens.clear();
     }
 
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
 }

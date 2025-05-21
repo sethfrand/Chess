@@ -1,7 +1,7 @@
 package handler;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.JsonObject;
 import model.GameData;
 import service.AuthService;
 import service.GameService;
@@ -27,7 +27,7 @@ public class GameHandler {
         String username = authService.getUsernameForToken(authToken);
         if (username == null) {
             response.status(401);
-            return gson.toJson(new ErrorResponse("Error: unauthorzied"));
+            return gson.toJson(new ErrorResponse("Error: unauthorized"));
         }
         Collection<GameData> games = gameService.listGames();
         response.status(200);
@@ -47,13 +47,29 @@ public class GameHandler {
             return gson.toJson(new ErrorResponse("Error: unauthorized"));
         }
         try {
-            JoinGameRequest joinRequest = gson.fromJson(request.body(), JoinGameRequest.class);
-            if (joinRequest == null) {
+//            JoinGameRequest joinRequest = gson.fromJson(request.body(), JoinGameRequest.class);
+//            if (joinRequest == null) {
+//                response.status(400);
+//                return gson.toJson(new ErrorResponse("Error: bad request"));
+            JsonObject joinJsonRequest = gson.fromJson(request.body(), JsonObject.class);
+
+            if (joinJsonRequest == null || !joinJsonRequest.has("gameID")) {
                 response.status(400);
                 return gson.toJson(new ErrorResponse("Error: bad request"));
             }
 
-            boolean result = gameService.joinGame(joinRequest.gameID, username, joinRequest.PlayerColor);
+            String gameStrID = joinJsonRequest.get("gameID").getAsString();
+            String playerColor = null;
+
+            if (joinJsonRequest.has("playerColor")) {
+                playerColor = joinJsonRequest.get("playerColor").getAsString().toUpperCase();
+                if (!playerColor.equals("WHITE") && !playerColor.equals("BLACK")) {
+                    response.status(400);
+                    return gson.toJson(new ErrorResponse("Error: bad request"));
+                }
+            }
+
+            boolean result = gameService.joinGame(gameStrID, username, playerColor);
             if (result) {
                 response.status(200);
                 return "";
@@ -73,22 +89,22 @@ public class GameHandler {
         String authToken = request.headers("authorization");
 
         if (authToken == null || authToken.isEmpty()) {
-            response.status(400);
-            return gson.toJson(new ErrorResponse("Error: bad request"));
+            response.status(401);
+            return gson.toJson(new ErrorResponse("Error: unauthorized"));
         }
         String username = authService.getUsernameForToken(authToken);
         if (username == null) {
             response.status(401);
-            return gson.toJson(new ErrorResponse("Error: unauthorzied"));
+            return gson.toJson(new ErrorResponse("Error: unauthorized"));
         }
         try {
             CreateGameRequest createRequest = gson.fromJson(request.body(), CreateGameRequest.class);
 
-            if (createRequest.gameNames == null || createRequest.gameNames.isEmpty()) {
+            if (createRequest.gameName == null || createRequest.gameName.isEmpty()) {
                 response.status(400);
                 return gson.toJson(new ErrorResponse("Error: bad request"));
             }
-            int gameID = gameService.createGame(createRequest.gameNames);
+            int gameID = gameService.createGame(createRequest.gameName);
             response.status(200);
             return gson.toJson(new GameIDRegistration(gameID));
         } catch (Exception e) {
@@ -99,12 +115,12 @@ public class GameHandler {
 
 
     private static class JoinGameRequest {
-        String PlayerColor;
+        String playerColor;
         String gameID;
     }
 
     private static class CreateGameRequest {
-        String gameNames;
+        String gameName;
     }
 
     private static class ListGameResponse {

@@ -25,7 +25,7 @@ public class UserService {
         }
 
         userDAO.createUser(user);
-        return AuthDAO.createAuth(user.getUserName());
+        return authDAO.createAuth(user.getUserName());
     }
 
     public void clear() {
