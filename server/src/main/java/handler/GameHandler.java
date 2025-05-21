@@ -58,13 +58,14 @@ public class GameHandler {
                 response.status(200);
                 return "";
             } else {
-                response.status(403);
+                response.status(400);
                 return gson.toJson(new ErrorResponse("Error: already taken"));
             }
         } catch (Exception e) {
             response.status(400);
             return gson.toJson(new ErrorResponse("Error: bad request"));
         }
+
     }
 
     public Object createGame(Request request, Response response) {

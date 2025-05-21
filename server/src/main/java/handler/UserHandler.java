@@ -80,12 +80,13 @@ public class UserHandler {
             }
 
             response.status(200);
-            response.type("application/json");
+            //response.type("application/json");
             return gson.toJson(authdata);
         } catch (Exception e) {
             response.status(400);
             return gson.toJson(new ErrorResponse("Error: bad request"));
         }
+
     }
 
     public Object logout(Request request, Response response) {
@@ -101,7 +102,7 @@ public class UserHandler {
             return "";
         } else {
             response.status(401);
-            return gson.toJson(new ErrorResponse("Unauthorized"));
+            return gson.toJson(new ErrorResponse("Error: Unauthorized"));
         }
     }
 
