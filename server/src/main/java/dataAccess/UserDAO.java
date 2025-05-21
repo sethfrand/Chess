@@ -13,7 +13,7 @@ public class UserDAO {
         users.put(user.getUserName(), user);
     }
 
-    public static UserData getUser(String userName) {
+    public UserData getUser(String userName) {
         return users.get(userName);
     }
 

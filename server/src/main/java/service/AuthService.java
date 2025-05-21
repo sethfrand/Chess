@@ -11,7 +11,7 @@ public class AuthService {
     private final AuthDAO authDAO = new AuthDAO();
 
     public AuthData login(String username, String password) {
-        UserData user = UserDAO.getUser(username);
+        UserData user = userDAO.getUser(username);
         if (user == null || !user.getPassword().equals(password)) {
             return null;
         }

@@ -1,6 +1,7 @@
 package handler;
 
 import com.google.gson.Gson;
+import dataAccess.DataAccessException;
 import model.AuthData;
 import model.UserData;
 import spark.*;
@@ -18,11 +19,11 @@ public class UserHandler {
             RegisterRequest registerRequest = gson.fromJson(request.body(), RegisterRequest.class);
 
             if (registerRequest.username == null || registerRequest.password == null || registerRequest.email == null) {
-                response.status(200);
+                response.status(400);
                 return gson.toJson(new ErrorResponse("Error: bad request"));
             }
             UserData user = new UserData(registerRequest.username, registerRequest.password, registerRequest.email);
-            AuthData authData = UserService.register(user);
+            AuthData authData = userService.register(user);
 
             if (authData != null) {
                 response.status(200);
@@ -31,11 +32,12 @@ public class UserHandler {
                 response.status(403);
                 return gson.toJson(new ErrorResponse("Error: already taken "));
             }
-        } catch (RuntimeException e) {
+        } catch (RuntimeException | DataAccessException e) {
             response.status(400);
             return gson.toJson(new ErrorResponse("Error: bad request"));
 
         }
+    }
 
 //        UserData user = new UserData();
 //        UserData.setUserName = (RegisterRequeset.username);
@@ -60,7 +62,6 @@ public class UserHandler {
 //
 //        }
 
-    }
 
     public Object login(Request request, Response response) {
         LoginRequest loginRequest = gson.fromJson(request.body(), LoginRequest.class);
@@ -100,7 +101,7 @@ public class UserHandler {
 
     public Object clear(Request request, Response response) {
         try {
-            UserService.clear();
+            userService.clear();
             authService.clear();
             response.status(200);
             return "";
@@ -134,8 +135,8 @@ public class UserHandler {
     }
 
     private static class RegisterRequest {
-        static String username;
-        static String password;
+        String username;
+        String password;
         String email;
     }
 }

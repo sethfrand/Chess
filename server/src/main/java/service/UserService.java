@@ -1,23 +1,34 @@
 package service;
 
 import dataAccess.AuthDAO;
+import dataAccess.DataAccessException;
 import dataAccess.UserDAO;
 import model.*;
 
 public class UserService {
-    private static final UserDAO userDAO = new UserDAO();
-    private final AuthDAO authDAO = new AuthDAO();
+    private final UserDAO userDAO;
+    private final AuthDAO authDAO;
 
-    public static AuthData register(UserData user) {
-        if (UserDAO.getUser(user.getUserName()) != null) {
-            return null; //this means that the user alreadt exists int he system
+    public UserService() {
+        this.userDAO = new UserDAO();
+        this.authDAO = new AuthDAO();
+    }
+
+    public AuthData register(UserData user) throws DataAccessException {
+        if (user == null || user.getUserName() == null || user.getUserName().isEmpty()) {
+            throw new DataAccessException("Invalid user data");
         }
-        userDAO.createUser(user); //create the user
 
+        if (userDAO.getUser(user.getUserName()) != null) {
+            throw new DataAccessException("User already exists");
+        }
+
+        userDAO.createUser(user);
         return AuthDAO.createAuth(user.getUserName());
     }
 
-    public static void clear() {
+    public void clear() {
         userDAO.clear();
+        authDAO.clear();
     }
 }
