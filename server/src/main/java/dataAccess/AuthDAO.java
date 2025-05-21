@@ -9,7 +9,6 @@ import java.util.UUID;
 public class AuthDAO {
     private static final Map<String, String> authTokens = new HashMap<>();
 
-
     public static AuthData createAuth(String username) {
         String authToken = UUID.randomUUID().toString();
         //this will create the random string to be the auth token
