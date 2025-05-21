@@ -47,10 +47,6 @@ public class GameHandler {
             return gson.toJson(new ErrorResponse("Error: unauthorized"));
         }
         try {
-//            JoinGameRequest joinRequest = gson.fromJson(request.body(), JoinGameRequest.class);
-//            if (joinRequest == null) {
-//                response.status(400);
-//                return gson.toJson(new ErrorResponse("Error: bad request"));
             JsonObject joinJsonRequest = gson.fromJson(request.body(), JsonObject.class);
 
             if (joinJsonRequest == null || !joinJsonRequest.has("gameID")
