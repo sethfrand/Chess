@@ -1,6 +1,7 @@
 package handler;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import service.AuthService;
 import service.GameService;
 import spark.Request;
@@ -28,20 +29,70 @@ public class GameHandler {
             return gson.toJson(new ErrorResponse("Error: unauthorzied"));
         }
         Collection<GameData> games = gameService.listGames();
-        
+        response.status(200);
+        return gson.toJson(new ListGameResponse(games));
     }
 
     public Object joinGame(Request request, Response response) {
-        JoinGameRequest joinRequest = gson.fromJson(request.body(), JoinGameRequest.class);
-        response.status(200);
-        return "";
+        String authToken = request.headers("authorization");
+
+        if (authToken == null || authToken.isEmpty()) {
+            response.status(401);
+            return gson.toJson(new ErrorResponse("Error: unauthorized"));
+        }
+        String username = authService.getUsernameForToken(authToken);
+        if (username == null) {
+            response.status(401);
+            return gson.toJson(new ErrorResponse("Error: unauthorized"));
+        }
+        try {
+            JoinGameRequest joinRequest = gson.fromJson(request.body(), JoinGameRequest.class);
+            if (joinRequest == null) {
+                response.status(400);
+                return gson.toJson(new ErrorResponse("Error: bad request"));
+            }
+
+            boolean result = gameService.joinGame(joinRequest.gameID, username, joinRequest.PlayerColor);
+            if (result) {
+                response.status(200);
+                return "";
+            } else {
+                response.status(403);
+                return gson.toJson(new ErrorResponse("Error: already taken"));
+            }
+        } catch (Exception e) {
+            response.status(400);
+            return gson.toJson(new ErrorResponse("Error: bad request"));
+        }
     }
 
-
     public Object createGame(Request request, Response response) {
-        CreateGameRequest createRequest = gson.fromJson(request.body(), CreateGameRequest.class);
-        response.status(200);
-        return "";
+
+        String authToken = request.headers("authorization");
+
+        if (authToken == null || authToken.isEmpty()) {
+            response.status(400);
+            return gson.toJson(new ErrorResponse("Error: bad request"));
+        }
+        String username = authService.getUsernameForToken(authToken);
+        if (username == null) {
+            response.status(401);
+            return gson.toJson(new ErrorResponse("Error: unauthorzied"));
+        }
+        try {
+            CreateGameRequest createRequest = gson.fromJson(request.body(), CreateGameRequest.class);
+
+            if (createRequest.gameNames == null || createRequest.gameNames.isEmpty()) {
+                response.status(400);
+                return gson.toJson(new ErrorResponse("Error: bad request"));
+            }
+            int gameID = gameService.createGame(createRequest.gameNames);
+            response.status(200);
+            return gson.toJson(new GameIDRegistration(gameID));
+        } catch (Exception e) {
+            response.status(400);
+            return gson.toJson(new ErrorResponse("Error: bad request"));
+        }
     }
 
 
@@ -54,15 +105,28 @@ public class GameHandler {
         String gameNames;
     }
 
-    private static class ListGamesResponse {
+    private static class ListGameResponse {
+        Collection<GameData> games;
+
+        ListGameResponse(Collection<GameData> games) {
+            this.games = games;
+        }
 
     }
 
-    private static class GameCreatedResponse {
-        String gameID;
+    private static class GameIDRegistration {
+        int gameID;
 
-        GameCreatedResponse(String gameID) {
+        GameIDRegistration(int gameID) {
             this.gameID = gameID;
+        }
+    }
+
+    private static class ErrorResponse {
+        String message;
+
+        ErrorResponse(String message) {
+            this.message = message;
         }
     }
 }
