@@ -17,7 +17,7 @@ public class ChessGame {
     private ChessBoard board;
 
     public ChessGame() {
-        teamTurn = TeamColor.WHITE; // White traditionally goes first in chess
+        teamTurn = TeamColor.WHITE; // White goes first in chess
         board = new ChessBoard();
         board.resetBoard();
     }
