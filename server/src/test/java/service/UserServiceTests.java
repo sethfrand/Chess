@@ -3,15 +3,9 @@ package service;
 import model.UserData;
 import org.junit.jupiter.api.Test;
 import dataaccess.*;
-import handler.*;
-import server.*;
-import service.*;
 import model.*;
 
-import java.util.*;
-
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,7 +27,7 @@ public class UserServiceTests {
     }
 
     @Test
-    void negRegister_bc_Duplicates() throws DataAccessException {
+    void negRegisterbcDuplicates() throws DataAccessException {
         userService.register(new UserData("this user", "this pass", "this email"));
         AuthData another = userService.register(new UserData("this user", "this pass", "this email"));
         assertNull(another);
