@@ -7,18 +7,18 @@ import model.UserData;
 
 public class UserDAO {
 
-    private static final Map<String, UserData> Users = new HashMap<>();
+    private static final Map<String, UserData> USERS = new HashMap<>();
 
     public void createUser(UserData user) {
-        Users.put(user.getUserName(), user);
+        USERS.put(user.getUserName(), user);
     }
 
     public UserData getUser(String userName) {
-        return Users.get(userName);
+        return USERS.get(userName);
     }
 
     public void clear() {
-        Users.clear();
+        USERS.clear();
     }
 
     @Override

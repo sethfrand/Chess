@@ -10,32 +10,32 @@ import java.util.Map;
 public class GameDAO {
 
     private static int nextID = 1;
-    private static final Map<Integer, GameData> Games = new HashMap<>();
+    private static final Map<Integer, GameData> GAMES = new HashMap<>();
 
     public static void clear() {
         nextID = 1;
-        Games.clear();
+        GAMES.clear();
     }
 
     public int createGame(String gameName) {
         int gameID = nextID++;
         ChessGame game = new ChessGame();
         GameData gameData = new GameData(gameID, null, null, gameName, game);
-        Games.put(gameID, gameData);
+        GAMES.put(gameID, gameData);
 
         return gameID;
     }
 
     public Collection<GameData> listGames() {
-        return Games.values();
+        return GAMES.values();
     }
 
     public GameData getGame(int gameID) {
-        return Games.get(gameID);
+        return GAMES.get(gameID);
     }
 
     public boolean takeColor(int gameID, String username, String playerColor) {
-        GameData gameData = Games.get(gameID);
+        GameData gameData = GAMES.get(gameID);
         if (gameData == null) {
             return false;
         }
