@@ -20,4 +20,9 @@ public class UserDAO {
     public void clear() {
         users.clear();
     }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

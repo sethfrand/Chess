@@ -2,6 +2,7 @@ package handler;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import model.GameData;
 import service.AuthService;
 import service.GameService;
 import spark.Request;

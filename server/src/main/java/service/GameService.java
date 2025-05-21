@@ -1,11 +1,39 @@
 package service;
+
 import dataAccess.GameDAO;
 import model.GameData;
 
+import java.util.Collection;
+
 public class GameService {
-    private final GameDAO gameDAO = new GameDao;
+    private final GameDAO gameDAO = new GameDAO();
 
-    public boolean joinGame(String gameID, String username, String playerColor) {
+    public int createGame(String gameName) {
+        return gameDAO.createGame(gameName);
+    }
 
+    public Collection<GameData> listGames() {
+        return gameDAO.listGames();
+    }
+
+    public boolean joinGame(String gameID, String username, String playerColor) throws Exception {
+        GameData game = gameDAO.getGame(gameID);
+        if (game == null) {
+            throw new Exception("Game not found");
+        }
+        if (playerColor == null) {
+            return true; // this means that there is no player associated with the desired colour
+        }
+
+        if (!playerColor.equals("WHITE") && !playerColor.equals("BLACK")) {
+            throw new Exception("Invalid player colour");
+        }
+
+
+        return gameDAO.takeColor(gameID, username, playerColor);
+    }
+
+    public void clear() {
+        GameDAO.clear();
     }
 }

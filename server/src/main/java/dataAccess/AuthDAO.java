@@ -33,4 +33,8 @@ public class AuthDAO {
         authTokens.clear();
     }
 
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

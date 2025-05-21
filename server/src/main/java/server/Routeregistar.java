@@ -19,8 +19,8 @@ public class Routeregistar {
         post("/user", userHandler::register);
         post("/session", userHandler::login);
         delete("/session", userHandler::logout);
-        get("/games", gameHandler::getGames);
-        post("/games", gameHandler::joinGame);
+        get("/game", gameHandler::getGames);
+        put("/game", gameHandler::joinGame);
         post("/game", gameHandler::createGame);
         delete("/db", userHandler::clear);
     }
