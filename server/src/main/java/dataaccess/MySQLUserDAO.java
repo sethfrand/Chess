@@ -34,7 +34,7 @@ public class MySQLUserDAO {
         } catch (SQLException e) {
             throw new DataAccessException("Unable to connect");
         }
-        
+
     }
 
     public void createUser(UserData user) throws DataAccessException {
@@ -100,7 +100,6 @@ public class MySQLUserDAO {
         } catch (SQLException e) {
             throw new DataAccessException("Unable to clear the users");
         }
-        ;
 
     }
 
