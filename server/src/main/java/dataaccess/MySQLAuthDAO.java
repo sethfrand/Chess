@@ -8,7 +8,7 @@ import java.sql.*;
 import java.util.UUID;
 
 public class MySQLAuthDAO {
-    public MySQLAuthDAO() throws DataAccessException {
+    public MySQLAuthDAO throws DataAccessException {
         configureDatabase();
 
     }
@@ -105,4 +105,6 @@ public class MySQLAuthDAO {
         }
 
     }
+    }
+
 }
