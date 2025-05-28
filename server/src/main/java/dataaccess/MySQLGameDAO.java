@@ -155,10 +155,9 @@ public class MySQLGameDAO {
             if (curGame.getWhiteUsername() != null) {
                 return false;
             }
-        }
-        newWhiteUsername = username;
-
-        if ("BLACK".equals(playColor)) {
+            newWhiteUsername = username;
+        } else if
+        ("BLACK".equals(playColor)) {
             if (curGame.getBlackUsername() != null) {
                 return false;
             }
@@ -168,7 +167,7 @@ public class MySQLGameDAO {
         }
 
         GameData updatedGame = new GameData(
-                curGame.getGameID(), curGame.getWhiteUsername(), curGame.getBlackUsername(),
+                curGame.getGameID(), newWhiteUsername, newBlackUsername,
                 curGame.getGameName(), curGame.getGame());
 
         return updateGame(gameID, updatedGame);
