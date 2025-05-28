@@ -8,9 +8,11 @@ import java.sql.*;
 import java.util.UUID;
 
 public class MySQLAuthDAO {
-    public MySQLAuthDAO() throws DataAccessException {
-        configureDatabase();
+    public MySQLAuthDAO() {
+    }
 
+    public void initialize() throws DataAccessException {
+        configureDatabase();
     }
 
     private final String[] create =

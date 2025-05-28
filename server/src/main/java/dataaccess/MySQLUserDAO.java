@@ -7,9 +7,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class MySQLUserDAO {
-    public MySQLUserDAO() throws DataAccessException {
-        configureDatabase();
+    public MySQLUserDAO() {
+    }
 
+    public void initialize() throws DataAccessException {
+        configureDatabase();
     }
 
     private final String[] create =

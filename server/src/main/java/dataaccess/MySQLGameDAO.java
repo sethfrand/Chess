@@ -12,9 +12,11 @@ import java.util.Collection;
 public class MySQLGameDAO {
     private final Gson gson = new Gson();
 
-    public MySQLGameDAO() throws DataAccessException {
-        configureDatabase();
+    public MySQLGameDAO() {
+    }
 
+    public void initialize() throws DataAccessException {
+        configureDatabase();
     }
 
     private final String[] create =
