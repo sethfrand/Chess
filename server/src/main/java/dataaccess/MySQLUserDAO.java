@@ -26,16 +26,7 @@ public class MySQLUserDAO {
             };
 
     private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (var connect = DatabaseManager.getConnection()) {
-            for (var table : create) {
-                try (var prep = connect.prepareStatement(table)) {
-                    prep.executeUpdate();
-                }
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException("Unable to connect");
-        }
+        DatabaseConfig.configureDatabase(create);
 
     }
 
