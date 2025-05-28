@@ -2,6 +2,7 @@ package handler;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import dataaccess.DataAccessException;
 import model.GameData;
 import service.AuthService;
 import service.GameService;
@@ -12,11 +13,23 @@ import java.util.Collection;
 
 public class GameHandler {
     private final Gson gson = new Gson();
-    private final GameService gameService = new GameService();
-    private final AuthService authService = new AuthService();
+//    private final GameService gameService = new GameService();
+//    private final AuthService authService = new AuthService();
+
+    private final GameService gameService;
+    private final AuthService authService;
+
+    public GameHandler() {
+        try {
+            this.authService = new AuthService();
+            this.gameService = new GameService();
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Initialization of services failed");
+        }
+    }
 
 
-    public Object getGames(Request request, Response response) {
+    public Object getGames(Request request, Response response) throws DataAccessException {
         String authToken = request.headers("authorization");
 
         if (authToken == null || authToken.isEmpty()) {
@@ -25,16 +38,21 @@ public class GameHandler {
 
         }
         String username = authService.getUsernameForToken(authToken);
-        if (username == null) {
-            response.status(401);
-            return gson.toJson(new ErrorResponse("Error: unauthorized"));
+        try {
+            if (username == null) {
+                response.status(401);
+                return gson.toJson(new ErrorResponse("Error: unauthorized"));
+            }
+            Collection<GameData> games = gameService.listGames();
+            response.status(200);
+            return gson.toJson(new ListGameResponse(games));
+        } catch (DataAccessException e) {
+            response.status(500);
+            return gson.toJson(new ErrorResponse("Error: server error"));
         }
-        Collection<GameData> games = gameService.listGames();
-        response.status(200);
-        return gson.toJson(new ListGameResponse(games));
     }
 
-    public Object joinGame(Request request, Response response) {
+    public Object joinGame(Request request, Response response) throws DataAccessException {
         String authToken = request.headers("authorization");
 
         if (authToken == null || authToken.isEmpty()) {
@@ -74,6 +92,10 @@ public class GameHandler {
                 response.status(403);
                 return gson.toJson(new ErrorResponse("Error: already taken"));
             }
+
+        } catch (DataAccessException e) {
+            response.status(500);
+            return gson.toJson(new ErrorResponse("Error: server error"));
         } catch (Exception e) {
             response.status(400);
             return gson.toJson(new ErrorResponse("Error: bad request"));
@@ -82,28 +104,33 @@ public class GameHandler {
     }
 
     public Object createGame(Request request, Response response) {
-
-        String authToken = request.headers("authorization");
-
-        if (authToken == null || authToken.isEmpty()) {
-            response.status(401);
-            return gson.toJson(new ErrorResponse("Error: unauthorized"));
-        }
-        String username = authService.getUsernameForToken(authToken);
-        if (username == null) {
-            response.status(401);
-            return gson.toJson(new ErrorResponse("Error: unauthorized"));
-        }
         try {
+            String authToken = request.headers("authorization");
+
+            if (authToken == null || authToken.isEmpty()) {
+                response.status(401);
+                return gson.toJson(new ErrorResponse("Error: unauthorized"));
+            }
+
+            String username = authService.getUsernameForToken(authToken);
+            if (username == null) {
+                response.status(401);
+                return gson.toJson(new ErrorResponse("Error: unauthorized"));
+            }
+
             CreateGameRequest createRequest = gson.fromJson(request.body(), CreateGameRequest.class);
 
             if (createRequest.gameName == null || createRequest.gameName.isEmpty()) {
                 response.status(400);
                 return gson.toJson(new ErrorResponse("Error: bad request"));
             }
+
             int gameID = gameService.createGame(createRequest.gameName);
             response.status(200);
             return gson.toJson(new GameIDRegistration(gameID));
+        } catch (DataAccessException e) {
+            response.status(500);
+            return gson.toJson(new ErrorResponse("Error: server error"));
         } catch (Exception e) {
             response.status(400);
             return gson.toJson(new ErrorResponse("Error: bad request"));

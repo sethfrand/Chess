@@ -72,7 +72,7 @@ public class MySQLGameDAO {
         }
     }
 
-    public Collection<GameData> allGames() throws DataAccessException {
+    public Collection<GameData> listGames() throws DataAccessException {
         var result = new ArrayList<GameData>();
         try (var connection = DatabaseManager.getConnection()) {
             var sqlStatement = "SELECT gameID, whiteUsername, blackUsername, gameName, game from games";
@@ -141,7 +141,7 @@ public class MySQLGameDAO {
         }
     }
 
-    public Boolean join(int gameID, String username, String playColor) throws DataAccessException {
+    public Boolean takeColor(int gameID, String username, String playColor) throws DataAccessException {
         GameData curGame = getGame(gameID);
         if (curGame == null) {
             return false;

@@ -14,9 +14,22 @@ import java.util.Set;
 
 public class UserHandler {
     private final Gson gson = new Gson();
-    private final AuthService authService = new AuthService();
-    private final UserService userService = new UserService();
-    private final GameService gameService = new GameService();
+    //    private final AuthService authService = new AuthService();
+//    private final UserService userService = new UserService();
+//    private final GameService gameService = new GameService();
+    private final AuthService authService;
+    private final UserService userService;
+    private final GameService gameService;
+
+    public UserHandler() {
+        try {
+            this.authService = new AuthService();
+            this.userService = new UserService();
+            this.gameService = new GameService();
+        } catch (DataAccessException e) {
+            throw new RuntimeException("service initialization failed");
+        }
+    }
 
     public Object register(Request request, Response response) {
         try {
@@ -84,7 +97,7 @@ public class UserHandler {
         }
     }
 
-    public Object logout(Request request, Response response) {
+    public Object logout(Request request, Response response) throws DataAccessException {
         String authToken = request.headers("Authorization");
 
         if (authToken == null || authToken.isEmpty()) {

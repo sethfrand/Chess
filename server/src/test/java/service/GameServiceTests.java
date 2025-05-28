@@ -20,13 +20,13 @@ public class GameServiceTests {
     private GameService gameService;
 
     @BeforeEach
-    void setup() {
+    void setup() throws DataAccessException {
         gameService = new GameService();
         gameService.clear();
     }
 
     @Test
-    void posGameCreate() {
+    void posGameCreate() throws DataAccessException {
         int gameID = gameService.createGame("new game");
         assertTrue(gameID > 0);
         Collection<GameData> games = gameService.listGames();
@@ -35,14 +35,14 @@ public class GameServiceTests {
     }
 
     @Test
-    void negGameCreate() {
+    void negGameCreate() throws DataAccessException {
         int gameID = gameService.createGame("");
         assertTrue(gameID > 0);
 
     }
 
     @Test
-    void posListGames() {
+    void posListGames() throws DataAccessException {
         gameService.createGame("Chess");
         Collection<GameData> games = gameService.listGames();
         assertEquals(1, games.size());
@@ -50,7 +50,7 @@ public class GameServiceTests {
     }
 
     @Test
-    void negListGames() {
+    void negListGames() throws DataAccessException {
         Collection<GameData> games = gameService.listGames();
         assertTrue(games.isEmpty());
 
@@ -70,7 +70,7 @@ public class GameServiceTests {
     }
 
     @Test
-    void clear() {
+    void clear() throws DataAccessException {
         gameService.createGame("short game");
         gameService.clear();
         assertTrue(gameService.listGames().isEmpty());

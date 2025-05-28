@@ -1,18 +1,26 @@
 package service;
 
+import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
+import dataaccess.MySQLGameDAO;
 import model.GameData;
 
 import java.util.Collection;
 
 public class GameService {
-    private final GameDAO gameDAO = new GameDAO();
+    //private final GameDAO gameDAO = new GameDAO();
+    private final MySQLGameDAO gameDAO;
 
-    public int createGame(String gameName) {
+    public GameService() throws DataAccessException {
+        this.gameDAO = new MySQLGameDAO();
+        gameDAO.initialize();
+    }
+
+    public int createGame(String gameName) throws DataAccessException {
         return gameDAO.createGame(gameName);
     }
 
-    public Collection<GameData> listGames() {
+    public Collection<GameData> listGames() throws DataAccessException {
         return gameDAO.listGames();
     }
 
@@ -38,7 +46,7 @@ public class GameService {
         }
     }
 
-    public void clear() {
-        GameDAO.clear();
+    public void clear() throws DataAccessException {
+        gameDAO.clear();
     }
 }

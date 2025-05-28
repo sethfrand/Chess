@@ -20,7 +20,7 @@ public class AuthServiceTests {
     private UserDAO userDAO;
 
     @BeforeEach
-    void setup() {
+    void setup() throws DataAccessException {
         authservice = new AuthService();
         userDAO = new UserDAO();
         authservice.clear();
@@ -28,7 +28,7 @@ public class AuthServiceTests {
     }
 
     @Test
-    void positiveLogIn() {
+    void positiveLogIn() throws DataAccessException {
         userDAO.createUser(new UserData("user", "pass", "email"));
         AuthData authData = authservice.login("user", "pass");
         assertNotNull(authData);
@@ -36,26 +36,26 @@ public class AuthServiceTests {
     }
 
     @Test
-    void negLogIn() {
+    void negLogIn() throws DataAccessException {
         userDAO.createUser(new UserData("user", "pass", "email"));
         AuthData authData = authservice.login("user", "not_pass");
         assertNull(authData);
     }
 
     @Test
-    void logoutPos() {
+    void logoutPos() throws DataAccessException {
         userDAO.createUser(new UserData("user", "pass", "email"));
         AuthData authData = authservice.login("user", "pass");
         assertTrue(authservice.logout(authData.getAuthToken()));
     }
 
     @Test
-    void logoutNeg() {
+    void logoutNeg() throws DataAccessException {
         assertFalse(authservice.logout("not a valid token, bob"));
     }
 
     @Test
-    void getUserTokenPositive() {
+    void getUserTokenPositive() throws DataAccessException {
         userDAO.createUser(new UserData("user", "pass", "email"));
         AuthData authData = authservice.login("user", "pass");
         String username = authservice.getUsernameForToken(authData.getAuthToken());
@@ -64,12 +64,12 @@ public class AuthServiceTests {
     }
 
     @Test
-    void getUserTokenNeg() {
+    void getUserTokenNeg() throws DataAccessException {
         assertNull(authservice.getUsernameForToken("not a valid token for this user"));
     }
 
     @Test
-    void clear() {
+    void clear() throws DataAccessException {
         userDAO.createUser(new UserData("user", "pass", "email"));
         AuthData authData = authservice.login("user", "pass");
         authservice.clear();

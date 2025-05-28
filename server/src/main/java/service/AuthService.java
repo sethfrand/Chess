@@ -1,17 +1,25 @@
 package service;
 
 
-import dataaccess.UserDAO;
-import dataaccess.AuthDAO;
+import dataaccess.*;
 import model.AuthData;
 import model.UserData;
 
 public class AuthService {
-    private final UserDAO userDAO = new UserDAO();
-    private final AuthDAO authDAO = new AuthDAO();
+    // private final UserDAO userDAO = new UserDAO();
+    //private final AuthDAO authDAO = new AuthDAO();
+    private final MySQLAuthDAO authDAO;
+    private final MySQLUserDAO userDAO;
 
-    public AuthData login(String username, String password) {
-        UserData user = userDAO.getUser(username);
+    public AuthService() throws DataAccessException {
+        this.userDAO = new MySQLUserDAO();
+        this.authDAO = new MySQLAuthDAO();
+        userDAO.initialize();
+        authDAO.initialize();
+    }
+
+    public AuthData login(String username, String password) throws DataAccessException {
+        UserData user = userDAO.verifyUser(username, password);
         if (user == null || !user.getPassword().equals(password)) {
             return null;
         }
@@ -21,16 +29,16 @@ public class AuthService {
 
     }
 
-    public boolean logout(String token) {
+    public boolean logout(String token) throws DataAccessException {
         //return AuthDAO.DeleteAuth(token);
-        return AuthDAO.deleteAuth(token);
+        return authDAO.deleteAuth(token);
     }
 
-    public String getUsernameForToken(String token) {
-        return authDAO.getUserName(token);
+    public String getUsernameForToken(String token) throws DataAccessException {
+        return authDAO.getUsername(token);
     }
 
-    public void clear() {
+    public void clear() throws DataAccessException {
         authDAO.clear();
     }
 
