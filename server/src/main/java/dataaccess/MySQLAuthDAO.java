@@ -36,7 +36,6 @@ public class MySQLAuthDAO {
         } catch (SQLException e) {
             throw new DataAccessException("Unable to connect");
         }
-
     }
 
     public AuthData createAuth(String username) throws DataAccessException {
