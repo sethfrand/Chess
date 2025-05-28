@@ -34,6 +34,16 @@ class MySQLDAOTests {
         userDAO.clear();
     }
 
+    private void verifyCreateAndGet(UserData user) throws DataAccessException {
+        assertDoesNotThrow(() -> userDAO.createUser(user));
+
+        UserData getUser = userDAO.getUser("Hello there");
+        assertNotNull(getUser);
+        assertEquals("Hello there", getUser.getUserName());
+        assertEquals("this@email.com", getUser.getEmail());
+        assertNotEquals("General Kenobi", getUser.getPassword());
+    }
+
     @AfterEach
     void tearDown() throws DataAccessException {
         authDAO.clear();
@@ -112,13 +122,7 @@ class MySQLDAOTests {
     @Test
     void createUserPos() throws DataAccessException {
         UserData user = new UserData("Hello there", "General Kenobi", "this@email.com");
-        assertDoesNotThrow(() -> userDAO.createUser(user));
-
-        UserData getUser = userDAO.getUser("Hello there");
-        assertNotNull(getUser);
-        assertEquals("Hello there", getUser.getUserName());
-        assertEquals("this@email.com", getUser.getEmail());
-        assertNotEquals("General Kenobi", getUser.getPassword());
+        verifyCreateAndGet(user);
     }
 
 
@@ -144,13 +148,7 @@ class MySQLDAOTests {
     @Test
     void getUserPos() throws DataAccessException {
         UserData user = new UserData("Hello there", "General Kenobi", "this@email.com");
-        assertDoesNotThrow(() -> userDAO.createUser(user));
-
-        UserData getUser = userDAO.getUser("Hello there");
-        assertNotNull(getUser);
-        assertEquals("Hello there", getUser.getUserName());
-        assertEquals("this@email.com", getUser.getEmail());
-        assertNotEquals("General Kenobi", getUser.getPassword());
+        verifyCreateAndGet(user);
 
     }
 
