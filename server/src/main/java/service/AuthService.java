@@ -20,7 +20,7 @@ public class AuthService {
 
     public AuthData login(String username, String password) throws DataAccessException {
         UserData user = userDAO.verifyUser(username, password);
-        if (user == null || !user.getPassword().equals(password)) {
+        if (user == null) {
             return null;
         }
         //return AuthDAO.createAuth(username);
