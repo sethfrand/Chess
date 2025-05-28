@@ -36,7 +36,7 @@ public class GameServiceTests {
 
     @Test
     void negGameCreate() throws DataAccessException {
-        int gameID = gameService.createGame("");
+        int gameID = gameService.createGame("-1");
         assertTrue(gameID > 0);
 
     }

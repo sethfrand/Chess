@@ -14,9 +14,6 @@ import java.util.Set;
 
 public class UserHandler {
     private final Gson gson = new Gson();
-    //    private final AuthService authService = new AuthService();
-//    private final UserService userService = new UserService();
-//    private final GameService gameService = new GameService();
     private final AuthService authService;
     private final UserService userService;
     private final GameService gameService;
@@ -54,9 +51,12 @@ public class UserHandler {
                 response.status(403);
                 return gson.toJson(new ErrorResponse("Error: already taken"));
             }
-        } catch (RuntimeException | DataAccessException e) {
-            response.status(400);
-            return gson.toJson(new ErrorResponse("Error: bad request"));
+        } catch (DataAccessException e) {
+            response.status(500);
+            return gson.toJson(new ErrorResponse("Error: " + e.getMessage()));
+        } catch (Exception e) {
+            response.status(500);
+            return gson.toJson(new ErrorResponse("Error: server error"));
         }
     }
 
@@ -68,7 +68,7 @@ public class UserHandler {
                 return gson.toJson(new ErrorResponse("Error: bad request"));
             }
 
-            // Ensure only "username" and "password" fields are present
+            // only username and password fields are present
             Set<String> keys = loginRequestJson.keySet();
             if (!keys.equals(Set.of("username", "password"))) {
                 response.status(400);
@@ -91,26 +91,37 @@ public class UserHandler {
 
             response.status(200);
             return gson.toJson(authData);
+        } catch (DataAccessException e) {
+            response.status(500);
+            return gson.toJson(new ErrorResponse("Error: " + e.getMessage()));
         } catch (Exception e) {
-            response.status(400);
-            return gson.toJson(new ErrorResponse("Error: bad request"));
+            response.status(500);
+            return gson.toJson(new ErrorResponse("Error: server error"));
         }
     }
 
-    public Object logout(Request request, Response response) throws DataAccessException {
-        String authToken = request.headers("Authorization");
+    public Object logout(Request request, Response response) {
+        try {
+            String authToken = request.headers("Authorization");
 
-        if (authToken == null || authToken.isEmpty()) {
-            response.status(401);
-            return gson.toJson(new ErrorResponse("Error: unauthorized"));
-        }
-        boolean result = authService.logout(authToken);
-        if (result) {
-            response.status(200);
-            return "";
-        } else {
-            response.status(401);
-            return gson.toJson(new ErrorResponse("Error: unauthorized"));
+            if (authToken == null || authToken.isEmpty()) {
+                response.status(401);
+                return gson.toJson(new ErrorResponse("Error: unauthorized"));
+            }
+            boolean result = authService.logout(authToken);
+            if (result) {
+                response.status(200);
+                return "";
+            } else {
+                response.status(401);
+                return gson.toJson(new ErrorResponse("Error: unauthorized"));
+            }
+        } catch (DataAccessException e) {
+            response.status(500);
+            return gson.toJson(new ErrorResponse("Error: " + e.getMessage()));
+        } catch (Exception e) {
+            response.status(500);
+            return gson.toJson(new ErrorResponse("Error: server error"));
         }
     }
 
@@ -121,6 +132,9 @@ public class UserHandler {
             gameService.clear();
             response.status(200);
             return "";
+        } catch (DataAccessException e) {
+            response.status(500);
+            return gson.toJson(new ErrorResponse("Error: " + e.getMessage()));
         } catch (Exception e) {
             response.status(500);
             return gson.toJson(new ErrorResponse("Error: server error"));

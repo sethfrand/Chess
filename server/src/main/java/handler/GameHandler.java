@@ -13,9 +13,6 @@ import java.util.Collection;
 
 public class GameHandler {
     private final Gson gson = new Gson();
-//    private final GameService gameService = new GameService();
-//    private final AuthService authService = new AuthService();
-
     private final GameService gameService;
     private final AuthService authService;
 
@@ -28,43 +25,48 @@ public class GameHandler {
         }
     }
 
-
-    public Object getGames(Request request, Response response) throws DataAccessException {
-        String authToken = request.headers("authorization");
-
-        if (authToken == null || authToken.isEmpty()) {
-            response.status(401);
-            return gson.toJson(new ErrorResponse("Error: bad request"));
-
-        }
-        String username = authService.getUsernameForToken(authToken);
+    public Object getGames(Request request, Response response) {
         try {
+            String authToken = request.headers("authorization");
+
+            if (authToken == null || authToken.isEmpty()) {
+                response.status(401);
+                return gson.toJson(new ErrorResponse("Error: unauthorized"));
+            }
+
+            String username = authService.getUsernameForToken(authToken);
             if (username == null) {
                 response.status(401);
                 return gson.toJson(new ErrorResponse("Error: unauthorized"));
             }
+
             Collection<GameData> games = gameService.listGames();
             response.status(200);
             return gson.toJson(new ListGameResponse(games));
         } catch (DataAccessException e) {
             response.status(500);
+            return gson.toJson(new ErrorResponse("Error: " + e.getMessage()));
+        } catch (Exception e) {
+            response.status(500);
             return gson.toJson(new ErrorResponse("Error: server error"));
         }
     }
 
-    public Object joinGame(Request request, Response response) throws DataAccessException {
-        String authToken = request.headers("authorization");
-
-        if (authToken == null || authToken.isEmpty()) {
-            response.status(401);
-            return gson.toJson(new ErrorResponse("Error: unauthorized"));
-        }
-        String username = authService.getUsernameForToken(authToken);
-        if (username == null) {
-            response.status(401);
-            return gson.toJson(new ErrorResponse("Error: unauthorized"));
-        }
+    public Object joinGame(Request request, Response response) {
         try {
+            String authToken = request.headers("authorization");
+
+            if (authToken == null || authToken.isEmpty()) {
+                response.status(401);
+                return gson.toJson(new ErrorResponse("Error: unauthorized"));
+            }
+
+            String username = authService.getUsernameForToken(authToken);
+            if (username == null) {
+                response.status(401);
+                return gson.toJson(new ErrorResponse("Error: unauthorized"));
+            }
+
             JsonObject joinJsonRequest = gson.fromJson(request.body(), JsonObject.class);
 
             if (joinJsonRequest == null || !joinJsonRequest.has("gameID")
@@ -95,12 +97,11 @@ public class GameHandler {
 
         } catch (DataAccessException e) {
             response.status(500);
-            return gson.toJson(new ErrorResponse("Error: server error"));
+            return gson.toJson(new ErrorResponse("Error: " + e.getMessage()));
         } catch (Exception e) {
             response.status(400);
             return gson.toJson(new ErrorResponse("Error: bad request"));
         }
-
     }
 
     public Object createGame(Request request, Response response) {
@@ -130,13 +131,12 @@ public class GameHandler {
             return gson.toJson(new GameIDRegistration(gameID));
         } catch (DataAccessException e) {
             response.status(500);
-            return gson.toJson(new ErrorResponse("Error: server error"));
+            return gson.toJson(new ErrorResponse("Error: " + e.getMessage()));
         } catch (Exception e) {
-            response.status(400);
-            return gson.toJson(new ErrorResponse("Error: bad request"));
+            response.status(500);
+            return gson.toJson(new ErrorResponse("Error: server error"));
         }
     }
-
 
     private static class JoinGameRequest {
         String playerColor;
@@ -153,7 +153,6 @@ public class GameHandler {
         ListGameResponse(Collection<GameData> games) {
             this.games = games;
         }
-
     }
 
     private static class GameIDRegistration {

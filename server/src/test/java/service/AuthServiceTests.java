@@ -17,12 +17,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class AuthServiceTests {
     private AuthService authservice;
-    private UserDAO userDAO;
+    private MySQLUserDAO userDAO;
 
     @BeforeEach
     void setup() throws DataAccessException {
         authservice = new AuthService();
-        userDAO = new UserDAO();
+        userDAO = new MySQLUserDAO();
         authservice.clear();
         userDAO.clear();
     }
