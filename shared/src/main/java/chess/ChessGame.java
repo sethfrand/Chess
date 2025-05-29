@@ -93,16 +93,22 @@ public class ChessGame {
                 ChessPiece piece = board.getPiece(curPos);
 
                 if (piece != null && piece.getTeamColor() != team) {
-                    HashSet<ChessMove> moves = piece.pieceMoves(board, curPos);
-                    for (ChessMove move : moves) {
-                        if (move.getEndPosition().equals(position)) {
-                            return true;
-                        }
+                    if (canAttack(piece, board, curPos, position)) {
+                        return true;
                     }
                 }
             }
         }
+        return false;
+    }
 
+    private boolean canAttack(ChessPiece piece, ChessBoard board, ChessPosition piecePos, ChessPosition kingPos) {
+        HashSet<ChessMove> moves = piece.pieceMoves(board, piecePos);
+        for (ChessMove move : moves) {
+            if (move.getEndPosition().equals(kingPos)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -198,13 +204,20 @@ public class ChessGame {
                 ChessPosition position = new ChessPosition(row, col);
                 ChessPiece piece = board.getPiece(position);
                 if (piece != null && piece.getTeamColor() == oppoColor) {
-                    Collection<ChessMove> moves = piece.pieceMoves(board, position);
-                    for (ChessMove move : moves) {
-                        if (move.getEndPosition().equals(kingPos)) {
-                            return true;
-                        }
+                    if (canAttackPos(piece, board, position, kingPos)) {
+                        return true;
                     }
                 }
+            }
+        }
+        return false;
+    }
+
+    private Boolean canAttackPos(ChessPiece piece, ChessBoard board, ChessPosition pos, ChessPosition targetPos) {
+        Collection<ChessMove> moves = piece.pieceMoves(board, pos);
+        for (ChessMove move : moves) {
+            if (move.getEndPosition().equals(targetPos)) {
+                return true;
             }
         }
         return false;
