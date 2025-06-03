@@ -1,6 +1,10 @@
 package ui;
 
+import dataaccess.DataAccessException;
+
+import javax.swing.plaf.synth.SynthLookAndFeel;
 import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
 
 public class Client {
     private final Scanner scanner;
@@ -174,5 +178,64 @@ public class Client {
         }
     }
 
-    
+    private void joinGame(String[] parts) throws Exception {
+        if (parts.length != 3) {
+            System.out.println("incorrect arguments, please use join <game_id> <WHITE> or <BLACK>");
+            return;
+        }
+        try {
+            int gameID = Integer.parseInt(parts[1]);
+            String color = parts[2].toUpperCase();
+
+
+            if (!color.equals("WHITE") && !color.equals("BLACK")) {
+                System.out.println("color must be WHITE or BLACK");
+                return;
+            }
+
+            if (facade.joinGame(gameID, color, authToken)) {
+                System.out.println("You have joined " + gameID + "successfully!");
+            } else {
+                System.out.println("You have joined " + gameID + "unsuccessfully!");
+            }
+        } catch (Exception e) {
+            System.out.println("gameID is invalid, enter a number");
+        }
+    }
+
+    private void observeGame(String[] parts) throws DataAccessException {
+        if (parts.length != 2) {
+            System.out.println("incorrect arguments, please use observe <game_id> ");
+            return;
+        }
+
+        try {
+            int gameID = Integer.parseInt(parts[1]);
+            if (facade.joinGame(gameID, null, authToken)) {
+                System.out.println("now observing " + gameID);
+            } else {
+                System.out.println("failed to start observing " + gameID);
+            }
+        } catch (Exception e) {
+            System.out.println("gameID is invalid, enter a number");
+        }
+    }
+
+    private void loginHelp() {
+        System.out.println("The available commands are..");
+        System.out.println(" create <game_name --This creates a new game");
+        System.out.println(" join <game_id> <WHITE|BLACK> -- This will let you join a game");
+        System.out.println(" list - This will last all the games");
+        System.out.println(" observe <game_id> -- this allows you to observe a game");
+        System.out.println(" logout -- This will log you out");
+        System.out.println(" help -- this will display (this) help menu again ");
+    }
+
+    private void logOutHelp() {
+        System.out.println("The available commands are..");
+        System.out.println("  register <username> <password> <email> -- This will register you as a user");
+        System.out.println("  help -- this will display (this) help menu again");
+        System.out.println("  login <username> <password> -- this will log you in ");
+        System.out.println("  quit -- this will kill the program");
+    }
 }
