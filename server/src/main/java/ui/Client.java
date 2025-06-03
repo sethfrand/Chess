@@ -14,13 +14,13 @@ public class Client {
         LOGGED_IN;
     }
 
-    public ChessClient(String serverURL) {
+    public Client(String serverURL) {
         this.scanner = new Scanner(System.in);
         this.state = ClientState.LOGGED_OUT;
         this.facade = new ServerFacade(serverURL);
     }
 
-    void run() {
+    public void run() {
         System.out.println("Welcome to the Chess game");
         System.out.print("Type 'help' to get a list of commands!");
 
@@ -57,7 +57,6 @@ public class Client {
         } else {
             logInCommands(command, string);
         }
-
         //handle commands when logged in
     }
 
@@ -133,7 +132,7 @@ public class Client {
         }
     }
 
-    void logout() throws Exception {
+    private void logout() throws Exception {
         if (facade.logout(authToken)) {
             authToken = null;
             curUser == null;
@@ -142,4 +141,38 @@ public class Client {
             System.out.println("logout failed");
         }
     }
+
+    private void createGame(String[] parts) throws Exception {
+        if (parts.length < 2) {
+            System.out.println("incorrect arguments, please use create <game_name");
+            return;
+        }
+        String gameName = String.join("", java.util.Arrays.copyOfRange(parts, 1, parts.length));
+        int gameID = facade.createGame(gameName, authToken);
+
+        if (gameID > 0) {
+            System.out.println("game with " + gameID + "created. Feel free to join!");
+        } else {
+            System.out.println("game creation failed");
+        }
+    }
+
+    private void listGames() throws Exception {
+        var games = facade.listGames(authToken);
+
+        if (games.isEmpty()) {
+            System.out.println("no games");
+            return;
+        }
+        System.out.println("Available games");
+        System.out.println("ID | GAME NAME | WHITE PLAYER | BLACK PLAYER");
+        for (var game : games) {
+            System.out.printf("%d | %s | %s | %sn",
+                    game.getGameID(), game.getGameName(),
+                    game.getWhiteUsername() != null ? game.getWhiteUsername() : "none",
+                    game.getBlackUsername() != null ? game.getBlackUsername() : "none");
+        }
+    }
+
+    
 }
