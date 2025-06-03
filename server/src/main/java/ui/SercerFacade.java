@@ -17,7 +17,7 @@ public class SercerFacade {
         this.gson = new Gson();
     }
 
-    public String register(String username, String password, String email) {
+    public String register(String username, String password, String email) throws Exception{
         var path = "/user";
         var request = new RegisterRequest(username, password, email);
 
@@ -58,7 +58,21 @@ public class SercerFacade {
         }
     }
 
-    
+    public boolean logout(String authtoken) throws Exception
+    {
+        var path = "/session";
+        makeRequest("DELETE",path, null,authtoken,null);
+        return true;
+    }
+
+    public int createGame(String gameName, String authToken)
+    {
+        var path = "/game";
+        var request = new CreateGameRec();
+
+    }
+
+
 
     private record RegisterRequest(String username, String password, String email) {
     }
@@ -66,5 +80,6 @@ public class SercerFacade {
     private record AuthResponse(String authToken, String username) {
     }
 
+    private record CreateGameRec(String gameName, String authToken){}
 
 }
