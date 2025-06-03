@@ -68,8 +68,19 @@ public class SercerFacade {
     public int createGame(String gameName, String authToken)
     {
         var path = "/game";
-        var request = new CreateGameRec();
+        var request = new CreateGameRec(gameName);
 
+        var response = makeRequest("POST",path,request,authToken,CreateGameResponse.class);
+        return response.gameID;
+    }
+
+    public boolean joinGame(int gameID, String playerColor, String authToken) throws Exception
+    {
+        var path = "/game";
+        var request = new JoinGameRequest(String.valueOf(gameID),playerColor);
+
+        makeRequest("PUT",path,request, authToken,null);
+        return true;
     }
 
 
@@ -79,7 +90,9 @@ public class SercerFacade {
 
     private record AuthResponse(String authToken, String username) {
     }
+    private record JoinGameRequest(String gameID, String playerColor);
 
-    private record CreateGameRec(String gameName, String authToken){}
+    private record CreateGameRec(String gameName){}
+    private record CreateGameResponse(int gameID);
 
 }
