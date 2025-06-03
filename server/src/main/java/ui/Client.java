@@ -52,7 +52,94 @@ public class Client {
         String command = string[0].toLowerCase();
 
         //handle commands when logged out
+        if (state == ClientState.LOGGED_OUT) {
+            logOutCommands(command, string);
+        } else {
+            logInCommands(command, string);
+        }
 
         //handle commands when logged in
+    }
+
+
+    private void logOutCommands(String command, String[] string) throws Exception {
+        switch (command) {
+            case ("help") -> logOutHelp();
+            break;
+            case ("login") -> login(string);
+            break;
+            case ("register") -> register(string);
+            break;
+            default -> System.out.println("command " + command + "unknown, type 'help' for a list of commands");
+        }
+    }
+
+    private void logInCommands(String command, String[] string) throws Exception {
+        switch (command) {
+            case ("help") -> loginHelp();
+            break;
+            case ("logout") -> logout();
+            break;
+            case ("create") -> createGame();
+            break;
+            case ("list") -> listGames();
+            break;
+            case ("join") -> joinGame();
+            break;
+            case ("observe") -> observeGame();
+            break;
+            default -> System.out.println("command " + command + "unknown, type 'help' for a list of commands");
+        }
+
+    }
+
+    private void login(String[] parts) throws Exception {
+        if (parts.length != 3) {
+            System.out.println("incorrect arguments, please use login <username> <password>");
+            return;
+        }
+        String username = parts[1];
+        String password = parts[2];
+
+        authToken = facade.login(username, password);
+        if (authToken != null) {
+            curUser = username;
+            state = ClientState.LOGGED_IN;
+            System.out.println("logging in as " + username);
+
+
+        } else {
+            System.out.println("failed login");
+        }
+    }
+
+    private void register(String[] parts) {
+        if (parts.length != 4) {
+            System.out.println("incorrect arguments, please use register <username> <password> <email> ");
+            return;
+        }
+        String username = parts[1];
+        String password = parts[2];
+        String email = parts[3];
+
+        authToken = facade.register(username, password, email);
+        if (authToken != null) {
+            curUser = username;
+            state = ClientState.LOGGED_IN;
+            System.out.println("registered and logging in as " + username);
+
+        } else {
+            System.out.println("failed registration");
+        }
+    }
+
+    void logout() throws Exception {
+        if (facade.logout(authToken)) {
+            authToken = null;
+            curUser == null;
+            state = ClientState.LOGGED_OUT;
+        } else {
+            System.out.println("logout failed");
+        }
     }
 }
