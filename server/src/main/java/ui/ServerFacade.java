@@ -84,6 +84,7 @@ public class ServerFacade {
         return response.gameID;
     }
 
+
     public boolean joinGame(int gameID, String playerColor, String authToken) throws Exception {
         var path = "/game";
         var request = new JoinGameRequest(String.valueOf(gameID), playerColor);
@@ -134,6 +135,10 @@ public class ServerFacade {
         var path = "/game";
         var response = makeRequest("GET", path, null, authToken, ListGamesResponse.class);
         return response.games();
+    }
+
+    public GameData getGame(String authToken) {
+        var games = 
     }
 
 

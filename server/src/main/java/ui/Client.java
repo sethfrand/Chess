@@ -1,5 +1,7 @@
 package ui;
 
+import chess.ChessBoard;
+import chess.ChessGame;
 import dataaccess.DataAccessException;
 import model.GameData;
 
@@ -14,6 +16,7 @@ public class Client {
     private String curUser;
     private ClientState state;
     private GameData curGame;
+    private ChessGame.TeamColor team;
 
     private enum ClientState {
         LOGGED_OUT,
@@ -43,7 +46,6 @@ public class Client {
                 processCommand(input);
             } catch (Exception e) {
                 System.out.println("Error" + e.getMessage());
-                e.printStackTrace();
             }
         }
     }
@@ -64,10 +66,36 @@ public class Client {
         //handle commands when logged out
         if (state == ClientState.LOGGED_OUT) {
             logOutCommands(command, string);
-        } else {
+        } else if (state == ClientState.LOGGED_IN) {
             logInCommands(command, string);
+        } else {
+            inGameCommmands(command, string);
+
         }
         //handle commands when logged in
+    }
+
+    private void inGameCommmands(String command, String[] string) throws Exception {
+        switch (command) {
+            case ("help") -> inGameHelp();
+            case ("redraw") -> redoBoard();
+            case ("leave") -> exitGame();
+            case ("move") -> System.out.println("Doing this later");
+            case ("resign") -> System.out.print("Nah dude, doing this later");
+            case ("highlight") -> System.out.println("this will highlight all the moves that the player can make");
+            default -> System.out.println("command " + command + " unknown, type 'help' for a list of commands");
+        }
+    }
+
+    private void redoBoard() {
+        System.out.println("Implementing later");
+    }
+
+    private void exitGame() {
+        curGame = null;
+        team = null;
+        state = ClientState.LOGGED_OUT;
+        System.out.println("leaving the game....");
     }
 
 
@@ -191,7 +219,11 @@ public class Client {
             }
 
             if (facade.joinGame(gameID, color, authToken)) {
-                System.out.println("You have joined " + gameID + " successfully!");
+                curGame = facade.getGame(authToken);
+                team = color.equals("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+                System.out.println("You have joined " + gameID + " successfully!, you will be playing as " + team);
+                state = ClientState.GAMING;
+                showBoard(team);
             } else {
                 System.out.println("You have joined " + gameID + " unsuccessfully!");
             }
@@ -210,8 +242,10 @@ public class Client {
             int gameID = Integer.parseInt(parts[1]);
             if (facade.joinGame(gameID, null, authToken)) {
                 System.out.println("now observing " + gameID);
+                state = ClientState.GAMING;
             } else {
                 System.out.println("failed to start observing " + gameID);
+                showBoard(ChessGame.TeamColor.WHITE);
             }
         } catch (Exception e) {
             System.out.println("gameID is invalid, enter a number");
@@ -236,6 +270,26 @@ public class Client {
         System.out.println("  quit -- this will kill the program");
     }
 
+    private void inGameHelp() {
+        System.out.println("The available commands are..");
+        System.out.println("resign");
+        System.out.println("redraw");
+        System.out.println("leave");
+        System.out.println("move");
+        System.out.println("highlight");
+    }
+
+
+    private void showBoard(ChessGame.TeamColor team) {
+        if (curGame != null && curGame.getGame() != null) {
+            ChessBoard board = curGame.getGame().getBoard();
+            System.out.println();
+            Board.printBoard(board, team);
+        } else {
+            System.out.println("No board to show");
+        }
+    }
+
     public static void main(String[] args) {
         String serverURL = "http://localhost:3456";
         if (args.length > 0) {
@@ -244,4 +298,6 @@ public class Client {
         Client client = new Client(serverURL);
         client.run();
     }
+
+
 }
