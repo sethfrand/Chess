@@ -46,7 +46,7 @@ public class ServerFacade {
     }
 
     private void writeHeads(HttpURLConnection http, String authToken) {
-        if (authToken == null) {
+        if (authToken != null) {
             http.addRequestProperty("Authorization", authToken);
         }
         http.addRequestProperty("Content-Type", "application/json");

@@ -27,6 +27,7 @@ public class Client {
     public void run() {
         System.out.println("Welcome to the Chess game");
         System.out.print("Type 'help' to get a list of commands!");
+        System.out.println("");
 
         while (true) {
             printPrompt();
@@ -38,14 +39,16 @@ public class Client {
             try {
                 processCommand(input);
             } catch (Exception e) {
-                System.out.println("Error");
+                System.out.println("Error" + e.getMessage());
+                e.printStackTrace();
             }
         }
     }
 
     void printPrompt() {
         if (state == ClientState.LOGGED_OUT) {
-            System.out.println("Logged out....");
+            System.out.print("Logged out....");
+            System.out.println(" ");
         } else {
             System.out.println("[" + curUser + "].....");
         }
@@ -70,7 +73,7 @@ public class Client {
             case ("help") -> logOutHelp();
             case ("login") -> login(string);
             case ("register") -> register(string);
-            default -> System.out.println("command " + command + "unknown, type 'help' for a list of commands");
+            default -> System.out.println("command " + command + " unknown, type 'help' for a list of commands");
         }
     }
 
@@ -162,7 +165,7 @@ public class Client {
         System.out.println("Available games");
         System.out.println("ID | GAME NAME | WHITE PLAYER | BLACK PLAYER");
         for (var game : games) {
-            System.out.printf("%d | %s | %s | %sn",
+            System.out.printf("%d | %s | %s | %s%n",
                     game.getGameID(), game.getGameName(),
                     game.getWhiteUsername() != null ? game.getWhiteUsername() : "none",
                     game.getBlackUsername() != null ? game.getBlackUsername() : "none");
@@ -231,7 +234,7 @@ public class Client {
     }
 
     public static void main(String[] args) {
-        String serverURL = "http://localhost:1234";
+        String serverURL = "http://localhost:3456";
         if (args.length > 0) {
             serverURL = args[0];
         }
