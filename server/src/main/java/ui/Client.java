@@ -243,7 +243,6 @@ public class Client {
         try {
             int gameID = Integer.parseInt(parts[1]);
 
-
             curGame = facade.getGame(gameID, authToken);
             System.out.println("now observing " + gameID);
             state = ClientState.GAMING;

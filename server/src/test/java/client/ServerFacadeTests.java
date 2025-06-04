@@ -198,6 +198,26 @@ public class ServerFacadeTests {
 
 
     @Test
+    public void makeRequestPos() throws Exception {
+        String authToken = facade.register("obi wan", "password", "email");
+        
+        Assertions.assertDoesNotThrow(() ->
+        {
+            facade.makeRequest("GET", "/game", null, authToken, Object.class);
+        });
+
+    }
+
+    @Test
+    public void makeRequestNeg() throws Exception {
+        Assertions.assertThrows(Exception.class, () ->
+        {
+            facade.makeRequest("Get", "/invalid", null, "invalid", Object.class);
+        });
+
+    }
+
+    @Test
     public void observe() throws Exception {
         String authToken1 = facade.register("obi wan", "password", "email");
         String authToken2 = facade.register("obi two", "password", "email2");
