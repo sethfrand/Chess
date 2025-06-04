@@ -219,17 +219,35 @@ public class Client {
                 return;
             }
 
-            if (facade.joinGame(gameID, color, authToken)) {
-                curGame = facade.getGame(gameID, authToken);
-                team = color.equals("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
-                System.out.println("You have joined " + gameID + " successfully!, you will be playing as " + team);
-                state = ClientState.GAMING;
-                showBoard(team);
-            } else {
-                System.out.println("You have joined " + gameID + " unsuccessfully!");
+            GameData gameData = facade.getGame(gameID, authToken);
+            if (gameData == null) {
+                System.out.println("No game");
+                return;
             }
-        } catch (Exception e) {
+
+            if (color.equals("WHITE") && gameData.getWhiteUsername() != null) {
+                System.out.println("The white user is already taken");
+                return;
+            }
+            if (color.equals("BLACK") && gameData.getBlackUsername() != null) {
+                System.out.println("The black user is already taken");
+                return;
+            }
+            {
+                if (facade.joinGame(gameID, color, authToken)) {
+                    curGame = gameData;
+                    team = color.equals("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+                    System.out.println("You have joined " + gameID + " successfully!, you will be playing as " + team);
+                    state = ClientState.GAMING;
+                    showBoard(team);
+                } else {
+                    System.out.println("You have joined " + gameID + " unsuccessfully!, one of the colors may be taken");
+                }
+            }
+        } catch (NumberFormatException e) {
             System.out.println("gameID is invalid, enter a number");
+        } catch (Exception e) {
+            System.out.println("error joining game");
         }
     }
 
