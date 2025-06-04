@@ -65,4 +65,63 @@ public class ServerFacadeTests {
         });
     }
 
+    @Test
+    public void logoutPos() throws Exception {
+
+    }
+
+    @Test
+    public void logoutNeg() throws Exception {
+
+    }
+
+    @Test
+    public void createGamePos() throws Exception {
+
+    }
+
+    @Test
+    public void createGameNeg() throws Exception {
+
+    }
+
+    @Test
+    public void listGamePos() throws Exception {
+
+    }
+
+    @Test
+    public void listGameNeg() throws Exception {
+
+    }
+
+    @Test
+    public void joinGamePos() throws Exception {
+
+    }
+
+    @Test
+    public void joinGameNeg() throws Exception {
+
+    }
+
+    @Test
+    public void getGamePos() throws Exception {
+
+    }
+
+    @Test
+    public void getGameNeg() throws Exception {
+
+    }
+
+    @Test
+    public void observe() throws Exception {
+
+    }
+
+    @Test
+    public void fullTest() throws Exception {
+        
+    }
 }
