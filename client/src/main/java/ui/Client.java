@@ -2,7 +2,7 @@ package ui;
 
 import chess.ChessBoard;
 import chess.ChessGame;
-import dataaccess.DataAccessException;
+//import dataaccess.DataAccessException;
 import model.GameData;
 
 import java.util.Scanner;
@@ -233,7 +233,7 @@ public class Client {
         }
     }
 
-    private void observeGame(String[] parts) throws DataAccessException {
+    private void observeGame(String[] parts) {
         if (parts.length != 2) {
             System.out.println("incorrect arguments, please use observe <game_id> ");
             return;

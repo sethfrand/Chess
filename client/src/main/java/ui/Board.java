@@ -6,7 +6,6 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
-
 import static ui.EscapeSequences.*;
 
 

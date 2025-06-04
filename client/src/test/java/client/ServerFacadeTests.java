@@ -27,7 +27,6 @@ public class ServerFacadeTests {
 
     }
 
-
     @BeforeEach
     public void clearDatabase() throws Exception {
         // Clear the database before each test to ensure a fresh state
@@ -200,7 +199,7 @@ public class ServerFacadeTests {
     @Test
     public void makeRequestPos() throws Exception {
         String authToken = facade.register("obi wan", "password", "email");
-        
+
         Assertions.assertDoesNotThrow(() ->
         {
             facade.makeRequest("GET", "/game", null, authToken, Object.class);
