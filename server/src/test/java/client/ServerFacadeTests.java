@@ -1,9 +1,6 @@
 package client;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import server.Server;
 import ui.ServerFacade;
 
@@ -18,6 +15,16 @@ public class ServerFacadeTests {
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
         facade = new ServerFacade("http://localhost:" + port);
+
+    }
+
+    @BeforeEach
+    public void clearDatabase() throws Exception {
+        // Clear the database before each test to ensure a fresh state
+        try {
+            facade.makeRequest("DELETE", "/db", null, null, null);
+        } catch (Exception e) {
+        }
     }
 
     @AfterAll
@@ -39,7 +46,23 @@ public class ServerFacadeTests {
             facade.register("obiwan", "pass", "email");
             facade.register("obiwan", "another", "email");
         });
+    }
 
+    @Test
+    public void loginPos() throws Exception {
+        facade.register("obi", "wan", "kenobi");
+
+        String authToken = facade.login("obi", "wan");
+        Assertions.assertNotNull(authToken);
+        Assertions.assertFalse(authToken.isEmpty());
+    }
+
+    @Test
+    public void loginNeg() throws Exception {
+        Assertions.assertThrows(Exception.class, () ->
+        {
+            facade.login("someone", "wan");
+        });
     }
 
 }
