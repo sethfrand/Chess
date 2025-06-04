@@ -239,19 +239,20 @@ public class Client {
             return;
         }
 
+
         try {
             int gameID = Integer.parseInt(parts[1]);
-            if (facade.joinGame(gameID, null, authToken)) {
-                System.out.println("now observing " + gameID);
-                state = ClientState.GAMING;
-            } else {
-                System.out.println("failed to start observing " + gameID);
-                showBoard(ChessGame.TeamColor.WHITE);
-            }
+
+
+            curGame = facade.getGame(gameID, authToken);
+            System.out.println("now observing " + gameID);
+            state = ClientState.GAMING;
+            showBoard(ChessGame.TeamColor.WHITE);
         } catch (Exception e) {
             System.out.println("gameID is invalid, enter a number");
         }
     }
+
 
     private void loginHelp() {
         System.out.println("The available commands are..");

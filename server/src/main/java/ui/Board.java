@@ -1,16 +1,20 @@
 package ui;
 
+
 import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
+
 import static ui.EscapeSequences.*;
+
 
 public class Board {
 
+
     private static final int BOARD_SIZE = 8;
-    private static final String SIDE_CHARS = "  a b c d e f g h  ";
+    private static final String SIDE_CHARS = "    a  b  c  d  e  f  g  h    ";
 
 
     public static void printBoard(ChessBoard board, ChessGame.TeamColor perspective) {
@@ -21,58 +25,73 @@ public class Board {
         }
     }
 
+
     public static void printWhiteBoard(ChessBoard board) {
         System.out.print(ERASE_SCREEN);
 
-        System.out.println(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + SIDE_CHARS + RESET_BG_COLOR);
+
+        System.out.println(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + SIDE_CHARS + RESET_BG_COLOR);
+
 
         for (int row = 8; row >= 1; row--) {
             printWhiteRow(board, row);
         }
 
-        System.out.println(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + SIDE_CHARS + RESET_BG_COLOR);
+
+        System.out.println(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + SIDE_CHARS + RESET_BG_COLOR);
         System.out.println();
     }
 
+
     private static void printWhiteRow(ChessBoard board, int row) {
-        System.out.print(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + " " + row + " " + RESET_BG_COLOR);
+        System.out.print(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + " " + row + " " + RESET_BG_COLOR);
+
 
         for (int col = 1; col <= 8; col++) {
             ChessPosition position = new ChessPosition(row, col);
             printEachSquare(board, position, row, col);
         }
+        System.out.println(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + " " + row + " " + RESET_BG_COLOR);
     }
+
 
     public static void printBlackBoard(ChessBoard board) {
         System.out.print(ERASE_SCREEN);
 
-        String reverseSideChars = "  h g f e d c b a  ";
-        System.out.println(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + reverseSideChars + RESET_BG_COLOR);
+
+        String reverseSideChars = "    h  g  f  e  d  c  b  a    ";
+        System.out.println(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + reverseSideChars + RESET_BG_COLOR);
         for (int row = 1; row <= 8; row++) {
             printBlackRow(board, row);
         }
-        System.out.println(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + reverseSideChars + RESET_BG_COLOR);
+        System.out.println(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + reverseSideChars + RESET_BG_COLOR);
         System.out.println();
     }
 
+
     private static void printBlackRow(ChessBoard board, int row) {
-        System.out.print(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + " " + row + " " + RESET_BG_COLOR);
+        System.out.print(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + " " + row + " " + RESET_BG_COLOR);
 //do the opposite of printing white rows
         for (int col = 8; col >= 1; col--) {
             ChessPosition position = new ChessPosition(row, col);
             printEachSquare(board, position, row, col);
         }
+        System.out.println(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + " " + row + " " + RESET_BG_COLOR);
     }
+
 
     private static void printEachSquare(ChessBoard board, ChessPosition position, int row, int col) {
         boolean isWhite = (row + col) % 2 == 0;
-        String color = isWhite ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_DARK_GREY;
+        String color = isWhite ? SET_BG_COLOR_DARK_GREY : SET_BG_COLOR_LIGHT_GREY;
+
 
         ChessPiece piece = board.getPiece(position);
         String pieceChar = getPieceChar(piece);
 
+
         System.out.print(color + SET_TEXT_COLOR_BLACK + pieceChar + RESET_BG_COLOR + RESET_TEXT_COLOR);
     }
+
 
     private static String getPieceChar(ChessPiece piece) {
         if (piece == null) {
@@ -80,6 +99,7 @@ public class Board {
         }
         ChessPiece.PieceType type = piece.getPieceType();
         ChessGame.TeamColor team = piece.getTeamColor();
+
 
         if (team == ChessGame.TeamColor.WHITE) {
             return switch (type) {
@@ -100,7 +120,9 @@ public class Board {
                 case PAWN -> BLACK_PAWN;
             };
 
+
         }
     }
+
 
 }
