@@ -1,6 +1,7 @@
 package ui;
 
 import dataaccess.DataAccessException;
+import model.GameData;
 
 import javax.swing.plaf.synth.SynthLookAndFeel;
 import java.util.Scanner;
@@ -12,10 +13,12 @@ public class Client {
     private String authToken;
     private String curUser;
     private ClientState state;
+    private GameData curGame;
 
     private enum ClientState {
         LOGGED_OUT,
-        LOGGED_IN;
+        LOGGED_IN,
+        GAMING;
     }
 
     public Client(String serverURL) {
@@ -27,7 +30,7 @@ public class Client {
     public void run() {
         System.out.println("Welcome to the Chess game");
         System.out.print("Type 'help' to get a list of commands!");
-        System.out.println("");
+        System.out.println();
 
         while (true) {
             printPrompt();
@@ -149,7 +152,7 @@ public class Client {
         int gameID = facade.createGame(gameName, authToken);
 
         if (gameID > 0) {
-            System.out.println("game with " + gameID + "created. Feel free to join!");
+            System.out.println("game with " + gameID + " created. Feel free to join!");
         } else {
             System.out.println("game creation failed");
         }
@@ -188,9 +191,9 @@ public class Client {
             }
 
             if (facade.joinGame(gameID, color, authToken)) {
-                System.out.println("You have joined " + gameID + "successfully!");
+                System.out.println("You have joined " + gameID + " successfully!");
             } else {
-                System.out.println("You have joined " + gameID + "unsuccessfully!");
+                System.out.println("You have joined " + gameID + " unsuccessfully!");
             }
         } catch (Exception e) {
             System.out.println("gameID is invalid, enter a number");
@@ -217,7 +220,7 @@ public class Client {
 
     private void loginHelp() {
         System.out.println("The available commands are..");
-        System.out.println(" create <game_name --This creates a new game");
+        System.out.println(" create <game_name> --This creates a new game");
         System.out.println(" join <game_id> <WHITE|BLACK> -- This will let you join a game");
         System.out.println(" list - This will last all the games");
         System.out.println(" observe <game_id> -- this allows you to observe a game");

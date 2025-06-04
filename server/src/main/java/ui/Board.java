@@ -71,7 +71,7 @@ public class Board {
         ChessPiece piece = board.getPiece(position);
         String pieceChar = getPieceChar(piece);
 
-
+        System.out.print(color + SET_TEXT_COLOR_BLACK + pieceChar + RESET_BG_COLOR + RESET_TEXT_COLOR);
     }
 
     private static String getPieceChar(ChessPiece piece) {

@@ -39,6 +39,7 @@ public class ServerFacade {
             writeBody(request, http);
             http.connect();
 
+            notSuccessful(http);
             return readBody(http, responseClass);
         } catch (Exception e) {
             throw new Exception("request failed");
