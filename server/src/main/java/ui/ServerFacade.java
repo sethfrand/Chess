@@ -137,8 +137,14 @@ public class ServerFacade {
         return response.games();
     }
 
-    public GameData getGame(String authToken) {
-        var games = 
+    public GameData getGame(int gameID, String authToken) throws Exception {
+        var games = listGames(authToken);
+        for (var game : games) {
+            if (game.getGameID() == gameID) {
+                return game;
+            }
+        }
+        throw new Exception("no game with id " + gameID + "check to see if yours isvalid");
     }
 
 

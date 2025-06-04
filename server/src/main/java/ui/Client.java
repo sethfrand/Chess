@@ -5,9 +5,7 @@ import chess.ChessGame;
 import dataaccess.DataAccessException;
 import model.GameData;
 
-import javax.swing.plaf.synth.SynthLookAndFeel;
 import java.util.Scanner;
-import java.util.concurrent.ExecutionException;
 
 public class Client {
     private final Scanner scanner;
@@ -18,16 +16,19 @@ public class Client {
     private GameData curGame;
     private ChessGame.TeamColor team;
 
-    private enum ClientState {
-        LOGGED_OUT,
-        LOGGED_IN,
-        GAMING;
-    }
-
     public Client(String serverURL) {
         this.scanner = new Scanner(System.in);
         this.state = ClientState.LOGGED_OUT;
         this.facade = new ServerFacade(serverURL);
+    }
+
+    public static void main(String[] args) {
+        String serverURL = "http://localhost:3456";
+        if (args.length > 0) {
+            serverURL = args[0];
+        }
+        Client client = new Client(serverURL);
+        client.run();
     }
 
     public void run() {
@@ -69,13 +70,13 @@ public class Client {
         } else if (state == ClientState.LOGGED_IN) {
             logInCommands(command, string);
         } else {
-            inGameCommmands(command, string);
+            inGameCommands(command, string);
 
         }
         //handle commands when logged in
     }
 
-    private void inGameCommmands(String command, String[] string) throws Exception {
+    private void inGameCommands(String command, String[] string) throws Exception {
         switch (command) {
             case ("help") -> inGameHelp();
             case ("redraw") -> redoBoard();
@@ -219,7 +220,7 @@ public class Client {
             }
 
             if (facade.joinGame(gameID, color, authToken)) {
-                curGame = facade.getGame(authToken);
+                curGame = facade.getGame(gameID, authToken);
                 team = color.equals("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
                 System.out.println("You have joined " + gameID + " successfully!, you will be playing as " + team);
                 state = ClientState.GAMING;
@@ -290,13 +291,10 @@ public class Client {
         }
     }
 
-    public static void main(String[] args) {
-        String serverURL = "http://localhost:3456";
-        if (args.length > 0) {
-            serverURL = args[0];
-        }
-        Client client = new Client(serverURL);
-        client.run();
+    private enum ClientState {
+        LOGGED_OUT,
+        LOGGED_IN,
+        GAMING
     }
 
 

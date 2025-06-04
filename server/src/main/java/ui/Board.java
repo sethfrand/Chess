@@ -27,14 +27,14 @@ public class Board {
         System.out.println(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + SIDE_CHARS + RESET_BG_COLOR);
 
         for (int row = 8; row >= 1; row--) {
-            printWhitekRow(board, row);
+            printWhiteRow(board, row);
         }
 
         System.out.println(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + SIDE_CHARS + RESET_BG_COLOR);
         System.out.println();
     }
 
-    private static void printWhitekRow(ChessBoard board, int row) {
+    private static void printWhiteRow(ChessBoard board, int row) {
         System.out.print(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + " " + row + " " + RESET_BG_COLOR);
 
         for (int col = 1; col <= 8; col++) {
