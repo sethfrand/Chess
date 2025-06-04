@@ -113,7 +113,7 @@ public class ServerFacade {
             try (InputStream bodyRes = http.getErrorStream()) {
                 if (bodyRes != null) {
                     InputStreamReader reader = new InputStreamReader(bodyRes);
-                    var responseError = gson.fromJson(reader, ErrorResponse.Class);
+                    var responseError = gson.fromJson(reader, ErrorResponse.class);
                     if (responseError != null && responseError.message() != null) {
                         error = responseError.message();
                     }
@@ -121,8 +121,8 @@ public class ServerFacade {
             } catch (Exception e) {
                 System.out.println("error");
             }
+            throw new Exception(error);
         }
-        throw new Exception(error);
     }
 
     private boolean successful(int status) {

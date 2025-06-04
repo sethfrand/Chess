@@ -68,11 +68,8 @@ public class Client {
     private void logOutCommands(String command, String[] string) throws Exception {
         switch (command) {
             case ("help") -> logOutHelp();
-            break;
             case ("login") -> login(string);
-            break;
             case ("register") -> register(string);
-            break;
             default -> System.out.println("command " + command + "unknown, type 'help' for a list of commands");
         }
     }
@@ -80,17 +77,11 @@ public class Client {
     private void logInCommands(String command, String[] string) throws Exception {
         switch (command) {
             case ("help") -> loginHelp();
-            break;
             case ("logout") -> logout();
-            break;
-            case ("create") -> createGame();
-            break;
+            case ("create") -> createGame(string);
             case ("list") -> listGames();
-            break;
-            case ("join") -> joinGame();
-            break;
-            case ("observe") -> observeGame();
-            break;
+            case ("join") -> joinGame(string);
+            case ("observe") -> observeGame(string);
             default -> System.out.println("command " + command + "unknown, type 'help' for a list of commands");
         }
 
@@ -116,7 +107,7 @@ public class Client {
         }
     }
 
-    private void register(String[] parts) {
+    private void register(String[] parts) throws Exception {
         if (parts.length != 4) {
             System.out.println("incorrect arguments, please use register <username> <password> <email> ");
             return;
@@ -139,7 +130,7 @@ public class Client {
     private void logout() throws Exception {
         if (facade.logout(authToken)) {
             authToken = null;
-            curUser == null;
+            curUser = null;
             state = ClientState.LOGGED_OUT;
         } else {
             System.out.println("logout failed");
@@ -237,5 +228,14 @@ public class Client {
         System.out.println("  help -- this will display (this) help menu again");
         System.out.println("  login <username> <password> -- this will log you in ");
         System.out.println("  quit -- this will kill the program");
+    }
+
+    public static void main(String[] args) {
+        String serverURL = "http://localhost:1234";
+        if (args.length > 0) {
+            serverURL = args[0];
+        }
+        Client client = new Client(serverURL);
+        client.run();
     }
 }
