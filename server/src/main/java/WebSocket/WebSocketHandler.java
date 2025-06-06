@@ -1,5 +1,6 @@
 package WebSocket;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
@@ -7,6 +8,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import server.Server;
 import service.AuthService;
 import service.GameService;
 import websocket.commands.UserGameCommand;
@@ -55,7 +57,12 @@ public class WebSocketHandler {
     private void makeMove(Session session, UserGameCommand command) {
     }
 
-    private void resign(Session session, UserGameCommand command) {
+    private void resign(Session session, UserGameCommand command) throws Exception
+    {
+        String authToken = command.getAuthToken();
+        String username = authService.getUsernameForToken(authToken);
+        GameData game = GameService.
+        ChessGame.TeamColor usercolor = getTeamColor(authService.getUsernameForToken(authToken),)
     }
 
     private void leave(Session session, UserGameCommand command) {
@@ -74,18 +81,16 @@ public class WebSocketHandler {
 
     @OnWebSocketClose
     public void onClose(Session session, int status, String why) {
-
         String authToken = sessionToAuth.remove(session);
-        Integer gameId = Integer.valueOf(sessionToGame.remove(session));
-
+        Integer gameId = sessionToGame.remove(session);
 
         if (gameId != null) {
             removeSessionFromGame(gameId, session);
 
             try {
                 String user = authService.getUsernameForToken(authToken);
-                if (user == null) {
-                    broadcastNotification(gameId, session, user);
+                if (user != null) {
+                    broadcastNotification(gameId, session, user + " left the game");
                 }
 
             } catch (Exception e) {
@@ -102,7 +107,7 @@ public class WebSocketHandler {
         String username = authService.getUsernameForToken(authToken);
         if (username == null)
         {
-            sendMessage(session,"invalid authentication token provided");
+            sendError(session,"invalid authentication token provided");
             return;
         }
 
@@ -111,16 +116,18 @@ public class WebSocketHandler {
 
         if (gameData == null)
         {
-            sendMessage((session,"game not found");
+            sendError(session,"game not found");
             return;
         }
 
         sessionToAuth.put(session,authToken);
         sessionToGame.put(session,gameID);
+        addSession(gameID,session);
 
-        game
 
+    }
 
+    private void addSession(int gameID, Session session) {
     }
 
     private GameData GetGameData(int gameID) throws Exception
