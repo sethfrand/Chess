@@ -17,7 +17,7 @@ public class GameService {
     }
 
     public GameData getGame(int GameID) throws DataAccessException {
-        return GameDAO.getGame(GameID);
+        return gameDAO.getGame(GameID);
     }
 
     public Boolean updateGame(int gameID, GameData game) throws Exception {
