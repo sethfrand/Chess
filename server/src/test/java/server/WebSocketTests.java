@@ -4,7 +4,7 @@ import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.TestFactory;
+//import org.junit.jupiter.api.TestFactory;
 import passoff.model.*;
 import passoff.server.TestServerFacade;
 import passoff.websocket.TestCommand;
@@ -43,7 +43,7 @@ public class WebSocketTests {
 
         serverFacade = new TestServerFacade("localhost", port);
         serverFacade.clear();
-        environment = new WebsocketTestingEnvironment("localhost", port, "/ws", org.junit.jupiter.api.TestFactory.getGsonBuilder());
+        environment = new WebsocketTestingEnvironment("localhost", port, "/ws", TestFactory.getGsonBuilder());
         waitTime = TestFactory.getMessageTime();
     }
 

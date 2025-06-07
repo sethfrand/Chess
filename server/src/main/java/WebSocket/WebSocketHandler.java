@@ -13,6 +13,7 @@ import service.AuthService;
 import service.GameService;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
@@ -42,10 +43,10 @@ public class WebSocketHandler {
         try {
             UserGameCommand command = gson.fromJson(message, UserGameCommand.class);
             switch (command.getCommandType()) {
-                case CONNECT -> connectionMade(session,command);
-                case LEAVE -> leave(session,command);
-                case RESIGN -> resign(session,command);
-                case MAKE_MOVE -> makeMove(session,command);
+                case CONNECT -> connectionMade(session, command);
+                case LEAVE -> leave(session, command);
+                case RESIGN -> resign(session, command);
+                case MAKE_MOVE -> makeMove(session, command);
 
             }
 
@@ -55,14 +56,43 @@ public class WebSocketHandler {
     }
 
     private void makeMove(Session session, UserGameCommand command) {
+
     }
 
-    private void resign(Session session, UserGameCommand command) throws Exception
-    {
+    private void resign(Session session, UserGameCommand command) throws Exception {
         String authToken = command.getAuthToken();
         String username = authService.getUsernameForToken(authToken);
-        GameData game = GameService.
-        ChessGame.TeamColor usercolor = getTeamColor(authService.getUsernameForToken(authToken),)
+
+        if (username == null) {
+            sendError(session, "invalid auth token");
+            return;
+        }
+        int gameID = command.getGameID();
+        GameData game = gameService.getGame(gameID);
+
+        if (game == null) {
+            sendError(session, "game does not exist");
+        }
+
+        if (!username.equals(game.getWhiteUsername()) && !username.equals(game.getBlackUsername())) {
+            sendError(session, "you are not a player, you cant resign");
+            return;
+        }
+
+        ChessGame chessGame = game.getGame();
+
+        if (chessGame.isInCheckmate(ChessGame.TeamColor.WHITE) || chessGame.isInStalemate(ChessGame.TeamColor.WHITE)
+                || chessGame.isInCheckmate(ChessGame.TeamColor.BLACK) || chessGame.isInStalemate(ChessGame.TeamColor.BLACK)) {
+            sendError(session, "game is already over, you can't resign");
+            return;
+        }
+        //Create logic for ending the game if someone resigns
+        String resigned = "the player " + username + " has resigned from the game";
+        broadcastNotification(gameID, session, resigned);
+
+        NotificationMessage notify = new NotificationMessage("you have resigned from " + session);
+        sendMessage(session, notify);
+
     }
 
     private void leave(Session session, UserGameCommand command) {
@@ -101,37 +131,55 @@ public class WebSocketHandler {
     }
 
 
-    private void connectionMade(Session session, UserGameCommand command) throws Exception
-    {
-        String authToken = command.getAuthToken();
-        String username = authService.getUsernameForToken(authToken);
-        if (username == null)
-        {
-            sendError(session,"invalid authentication token provided");
-            return;
+    private void connectionMade(Session session, UserGameCommand command) throws Exception {
+        try {
+            String authToken = command.getAuthToken();
+            String username = authService.getUsernameForToken(authToken);
+            if (username == null) {
+                sendError(session, "invalid authentication token provided");
+                return;
+            }
+
+            int gameID = command.getGameID();
+            GameData gameData = GetGameData(gameID);
+
+            if (gameData == null) {
+                sendError(session, "game not found");
+                return;
+            }
+
+            sessionToAuth.put(session, authToken);
+            sessionToGame.put(session, gameID);
+            addSession(gameID, session);
+            LoadGameMessage loadMessage = new LoadGameMessage(gameData.getGame());
+            sendMessage(session, loadMessage);
+
+            String gameRole = getUserRole(username, gameData);
+            if (gameRole == observer) {
+                String role = "an observer";
+            } else {
+                String role = "playing";
+            }
+            String notification = username + " has joined the game! They will be ";
+
+            broadcastNotification(gameID, session, notification);
+
+        } catch (Exception e) {
+            sendError(session, "There was an error connecting to the game " + e.getMessage());
         }
+    }
 
-        int gameID = command.getGameID();
-        GameData gameData = GetGameData(gameID);
-
-        if (gameData == null)
-        {
-            sendError(session,"game not found");
-            return;
-        }
-
-        sessionToAuth.put(session,authToken);
-        sessionToGame.put(session,gameID);
-        addSession(gameID,session);
-
+    private void sendError(Session session, String errorMessage) {
+        ErrorMessage error = new ErrorMessage(errorMessage);
+        sendMessage(session, error);
 
     }
 
     private void addSession(int gameID, Session session) {
+        sessions.computeIfAbsent(gameID, i -> new CopyOnWriteArrayList<>()).add(session);
     }
 
-    private GameData GetGameData(int gameID) throws Exception
-    {
+    private GameData GetGameData(int gameID) throws Exception {
         return GameData.getGame(gameID);
     }
 

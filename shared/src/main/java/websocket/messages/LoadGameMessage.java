@@ -5,4 +5,5 @@ import chess.ChessGame;
 
 public class LoadGameMessage {
 
+
 }
