@@ -74,6 +74,40 @@ public class Client {
         }
     }
 
+    @Override
+    public void onSocketText(String message) {
+        handleSocket(message);
+    }
+
+    @Override
+    public void Socketclose(int session, String why) {
+        System.out.println("Socket closed " + why);
+    }
+
+    @Override
+    public void socketError(Throwable why) {
+        System.out.println("Error with socket " + why.getMessage());
+    }
+
+
+    void handleSocket(String messege) {
+        try {
+            ServerMessage serverMessage = gson.fromJson(messege, ServerMessage.class);
+
+            switch (serverMessage.getServerMessageType()) {
+                case LOAD_GAME -> loadGame(gson.fromJson(messege, LoadGameMessage.class));
+                case NOTIFICATION -> notification(gson.fromJson(messege, LoadGameMessage.class));
+                case ERROR -> handleError(gson.fromJson(messege, LoadGameMessage.class));
+            }
+        } catch (Exception e) {
+            System.out.println("error handling socket message " + messege);
+        }
+    }
+
+    public void loadGame() {
+        
+    }
+
     public void run() {
         System.out.println("Welcome to the Chess game");
         System.out.print("Type 'help' to get a list of commands!");
