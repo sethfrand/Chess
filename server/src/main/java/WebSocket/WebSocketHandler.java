@@ -96,6 +96,7 @@ public class WebSocketHandler {
     }
 
     private void leave(Session session, UserGameCommand command) {
+        UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.LEAVE);
     }
 
     private void projectError(Session session, String s) {
@@ -141,7 +142,7 @@ public class WebSocketHandler {
             }
 
             int gameID = command.getGameID();
-            GameData gameData = GetGameData(gameID);
+            GameData gameData = gameService.getGame(gameID);
 
             if (gameData == null) {
                 sendError(session, "game not found");
@@ -155,17 +156,21 @@ public class WebSocketHandler {
             sendMessage(session, loadMessage);
 
             String gameRole = getUserRole(username, gameData);
-            if (gameRole == observer) {
-                String role = "an observer";
-            } else {
-                String role = "playing";
-            }
-            String notification = username + " has joined the game! They will be ";
+            String role = "observer".equals(gameRole) ? "an observer " : "a player";
+            String notification = username + " has joined the game as a " + role;
 
             broadcastNotification(gameID, session, notification);
 
         } catch (Exception e) {
             sendError(session, "There was an error connecting to the game " + e.getMessage());
+        }
+    }
+
+    private String getUserRole(String username, GameData gameData) {
+        if (username.equals(gameData.getWhiteUsername()) || username.equals(gameData.getBlackUsername())) {
+            return "player";
+        } else {
+            return "observer";
         }
     }
 
@@ -177,10 +182,6 @@ public class WebSocketHandler {
 
     private void addSession(int gameID, Session session) {
         sessions.computeIfAbsent(gameID, i -> new CopyOnWriteArrayList<>()).add(session);
-    }
-
-    private GameData GetGameData(int gameID) throws Exception {
-        return GameData.getGame(gameID);
     }
 
     private void broadcastNotification(Integer gameId, Session Excludesession, String message) {
@@ -206,8 +207,16 @@ public class WebSocketHandler {
         }
     }
 
-
     private void removeSessionFromGame(Integer gameId, Session session) {
+        CopyOnWriteArrayList<Session> gameSessions = sessions.get(gameId);
+        if (gameSessions != null) {
+            gameSessions.remove(session);
+            if (gameSessions.isEmpty()) ;
+            {
+                sessions.remove(gameId);
+            }
+
+        }
 
     }
 

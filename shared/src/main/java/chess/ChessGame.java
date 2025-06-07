@@ -198,7 +198,7 @@ public class ChessGame {
             }
 
         }//checking to see if the king can be attacked by any opposing pieces
-        TeamColor oppoColor = (teamColor == teamColor.WHITE) ? teamColor.BLACK : teamColor.WHITE;
+        TeamColor oppoColor = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition position = new ChessPosition(row, col);
