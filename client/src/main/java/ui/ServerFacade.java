@@ -21,6 +21,11 @@ public class ServerFacade {
         this.gson = new Gson();
     }
 
+    public String getServerUrl() {
+        return this.serverUrl;
+    }
+
+
     public String register(String username, String password, String email) throws Exception {
         var path = "/user";
         var request = new RegisterRequest(username, password, email);

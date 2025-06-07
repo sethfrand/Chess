@@ -5,6 +5,17 @@ import chess.ChessGame;
 //import dataaccess.DataAccessException;
 import model.GameData;
 
+import java.net.URI;
+
+import com.google.gson.Gson;
+import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.WebSocketAdapter;
+import org.eclipse.jetty.websocket.client.WebSocketClient;
+
+import websocket.commands.UserGameCommand;
+import websocket.messages.*;
+
+
 import java.util.Scanner;
 
 public class Client {
@@ -15,6 +26,12 @@ public class Client {
     private ClientState state;
     private GameData curGame;
     private ChessGame.TeamColor team;
+
+    private WebSocketClient client;
+    private Session session;
+
+    private final Gson gson = new Gson();
+
 
     public Client(String serverURL) {
         this.scanner = new Scanner(System.in);
@@ -29,6 +46,32 @@ public class Client {
         }
         Client client = new Client(serverURL);
         client.run();
+    }
+
+    private void connectWebsocket() throws Exception {
+        if (client == null) {
+            client = new WebSocketClient();
+            client.start();
+        }
+
+        String socketURL = facade.getServerUrl().replace("https://", "ws://") + "/ws";
+        URI uriServer = new URI(socketURL);
+
+        session = client.connect(this, uriServer).get();
+    }
+
+    public void webSocketDisconnect() {
+        try {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
+            if (client != null) {
+                client.stop();
+                client = null;
+            }
+        } catch (Exception e) {
+            System.out.println("Error disconnecting socket. " + e.getMessage());
+        }
     }
 
     public void run() {

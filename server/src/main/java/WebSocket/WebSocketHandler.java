@@ -8,7 +8,6 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import server.Server;
 import service.AuthService;
 import service.GameService;
 import websocket.commands.UserGameCommand;
@@ -55,7 +54,30 @@ public class WebSocketHandler {
         }
     }
 
-    private void makeMove(Session session, UserGameCommand command) {
+    private void makeMove(Session session, UserGameCommand command) throws Exception {
+
+        String authToken = command.getAuthToken();
+        String username = authService.getUsernameForToken(authToken);
+
+        if (username == null) {
+            sendError(session, "provided auth token is invalid");
+            return;
+        }
+        int gameID = command.getGameID();
+        GameData game = gameService.getGame(gameID);
+
+        if (game == null) {
+            sendError(session, "no game exists");
+            return;
+        }
+
+        ChessGame chessGame = game.getGame();
+        if (chessGame.isInCheckmate(ChessGame.TeamColor.WHITE) || chessGame.isInStalemate(ChessGame.TeamColor.WHITE)
+                || chessGame.isInCheckmate(ChessGame.TeamColor.BLACK) || chessGame.isInStalemate(ChessGame.TeamColor.BLACK)) {
+            sendError(session, "game is already over, you can't make a move");
+            return;
+        }
+
 
     }
 
@@ -72,6 +94,7 @@ public class WebSocketHandler {
 
         if (game == null) {
             sendError(session, "game does not exist");
+            return;
         }
 
         if (!username.equals(game.getWhiteUsername()) && !username.equals(game.getBlackUsername())) {
@@ -86,7 +109,7 @@ public class WebSocketHandler {
             sendError(session, "game is already over, you can't resign");
             return;
         }
-        //Create logic for ending the game if someone resigns
+
         String resigned = "the player " + username + " has resigned from the game";
         broadcastNotification(gameID, session, resigned);
 
@@ -95,8 +118,20 @@ public class WebSocketHandler {
 
     }
 
-    private void leave(Session session, UserGameCommand command) {
-        UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.LEAVE);
+    private void leave(Session session, UserGameCommand command) throws Exception {
+        String authToken = command.getAuthToken();
+        String username = authService.getUsernameForToken(authToken);
+        int gameID = command.getGameID();
+
+        if (username != null) {
+            removeSessionFromGame(gameID, session);
+            sessionToAuth.remove(session);
+            sessionToGame.remove(session);
+            String leaving = username + " left the game";
+            broadcastNotification(gameID, session, leaving);
+
+        }
+
     }
 
     private void projectError(Session session, String s) {
@@ -184,12 +219,12 @@ public class WebSocketHandler {
         sessions.computeIfAbsent(gameID, i -> new CopyOnWriteArrayList<>()).add(session);
     }
 
-    private void broadcastNotification(Integer gameId, Session Excludesession, String message) {
+    private void broadcastNotification(Integer gameId, Session ExcludeSession, String message) {
         NotificationMessage notification = new NotificationMessage(message);
         CopyOnWriteArrayList<Session> gameSession = sessions.get(gameId);
         if (gameSession != null) {
             for (Session session : gameSession) {
-                if (session != Excludesession) {
+                if (session != ExcludeSession) {
                     sendMessage(session, notification);
                 }
             }
@@ -211,13 +246,11 @@ public class WebSocketHandler {
         CopyOnWriteArrayList<Session> gameSessions = sessions.get(gameId);
         if (gameSessions != null) {
             gameSessions.remove(session);
-            if (gameSessions.isEmpty()) ;
-            {
+            if (gameSessions.isEmpty()) {
                 sessions.remove(gameId);
             }
 
         }
 
     }
-
 }
