@@ -18,7 +18,7 @@ import websocket.messages.*;
 
 import java.util.Scanner;
 
-public class Client {
+public class Client extends WebSocketAdapter {
     private final Scanner scanner;
     private final ServerFacade facade;
     private String authToken;
@@ -75,17 +75,17 @@ public class Client {
     }
 
     @Override
-    public void onSocketText(String message) {
+    public void onWebSocketText(String message) {
         handleSocket(message);
     }
 
     @Override
-    public void Socketclose(int session, String why) {
+    public void onWebSocketClose(int session, String why) {
         System.out.println("Socket closed " + why);
     }
 
     @Override
-    public void socketError(Throwable why) {
+    public void onWebSocketError(Throwable why) {
         System.out.println("Error with socket " + why.getMessage());
     }
 
@@ -104,8 +104,13 @@ public class Client {
         }
     }
 
-    public void loadGame() {
-        
+    public void loadGame(LoadGameMessage messege) {
+        if (messege.getGame() != null) {
+            curGame = new GameData(curGame.getGameID(), curGame.getWhiteUsername(), curGame.getBlackUsername(),
+                    curGame.getGameName(), curGame.getGame());
+            showBoard(team != null ? team : ChessGame.TeamColor.WHITE);
+        }
+
     }
 
     public void run() {
