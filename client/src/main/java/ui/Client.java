@@ -104,6 +104,14 @@ public class Client extends WebSocketAdapter {
         }
     }
 
+    private void handleError(ErrorMessage message) {
+        System.out.println("Error... " + message.getErrorMessage());
+    }
+
+    private void notification(NotificationMessage message) {
+        System.out.println(".... " + message.getMessage());
+    }
+
     public void loadGame(LoadGameMessage messege) {
         if (messege.getGame() != null) {
             curGame = new GameData(curGame.getGameID(), curGame.getWhiteUsername(), curGame.getBlackUsername(),
