@@ -121,13 +121,14 @@ public class Client extends WebSocketAdapter {
 
     }
 
-    public void sendCommand(UserGameCommand command)
-    {
-        try{
-            if (session != null)
-            {
-                
+    public void sendCommand(UserGameCommand command) {
+        try {
+            if (session.isOpen() && session != null) {
+                String json = gson.toJson(command);
+                session.getRemote().sendString(json);
             }
+        } catch (Exception e) {
+            System.out.println("Error sending the command " + e.getMessage());
         }
     }
 
