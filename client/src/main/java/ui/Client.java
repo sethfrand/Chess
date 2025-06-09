@@ -1,7 +1,6 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
+import chess.*;
 //import dataaccess.DataAccessException;
 import model.GameData;
 
@@ -196,6 +195,30 @@ public class Client extends WebSocketAdapter {
             System.out.println("and example could be move <e3> <e4>");
             return;
         }
+        try {
+            String from = parts[1].toLowerCase();
+            String to = parts[2].toLowerCase();
+
+            ChessPosition fromPos = convertPos(from);
+            ChessPosition toPos = convertPos(to);
+
+
+            if (fromPos == null || toPos == null) {
+                System.out.println("invalid, please use the correct format like 'e1' or 'e2' ");
+                return;
+            }
+
+            ChessMove move = new ChessMove(from, to, null);
+            UserGameCommand moveCommand = new UserGameCommand(authToken, curGame.getGameID());
+            sendCommand(moveCommand);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private ChessPosition convertPos(String from) {
+        
     }
 
     private void redoBoard() {
