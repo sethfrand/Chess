@@ -8,6 +8,7 @@ import model.GameData;
 import java.net.URI;
 
 import com.google.gson.Gson;
+import org.eclipse.jetty.server.Authentication;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
@@ -115,7 +116,7 @@ public class Client extends WebSocketAdapter {
     public void loadGame(LoadGameMessage messege) {
         if (messege.getGame() != null) {
             curGame = new GameData(curGame.getGameID(), curGame.getWhiteUsername(), curGame.getBlackUsername(),
-                    curGame.getGameName(), curGame.getGame());
+                    curGame.getGameName(), messege.getGame());
             showBoard(team != null ? team : ChessGame.TeamColor.WHITE);
         }
 
@@ -183,7 +184,7 @@ public class Client extends WebSocketAdapter {
             case ("redraw") -> redoBoard();
             case ("leave") -> exitGame();
             case ("move") -> System.out.println("Doing this later");
-            case ("resign") -> System.out.print("Nah dude, doing this later");
+            case ("resign") -> resignGame();
             case ("highlight") -> System.out.println("this will highlight all the moves that the player can make");
             default -> System.out.println("command " + command + " unknown, type 'help' for a list of commands");
         }
@@ -196,7 +197,7 @@ public class Client extends WebSocketAdapter {
     private void exitGame() {
         curGame = null;
         team = null;
-        state = ClientState.LOGGED_OUT;
+        state = ClientState.LOGGED_IN;
         System.out.println("leaving the game....");
     }
 
@@ -340,6 +341,16 @@ public class Client extends WebSocketAdapter {
                     team = color.equals("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
                     System.out.println("You have joined " + gameID + " successfully!, you will be playing as " + team);
                     state = ClientState.GAMING;
+
+
+                    try {
+                        connectWebsocket();
+
+
+                    } catch (Exception e) {
+                        System.out.println("Error connecting to the game " + e.getMessage());
+                    }
+
                     showBoard(team);
                 } else {
                     System.out.println("You have joined " + gameID + " unsuccessfully!, one of the colors may be taken");
@@ -365,9 +376,28 @@ public class Client extends WebSocketAdapter {
             curGame = facade.getGame(gameID, authToken);
             System.out.println("now observing " + gameID);
             state = ClientState.GAMING;
+
+            try {
+                connectWebsocket();
+                UserGameCommand connect = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+                sendCommand(connect);
+
+            } catch (Exception e) {
+                System.out.println("Error connecting to game to observe " + e.getMessage());
+            }
             showBoard(ChessGame.TeamColor.WHITE);
         } catch (Exception e) {
             System.out.println("gameID is invalid, enter a number");
+        }
+    }
+
+    public void resignGame() {
+        try {
+            UserGameCommand resign = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, curGame.getGameID());
+            sendCommand(resign);
+
+        } catch (Exception e) {
+            System.out.println("Error resigning from game " + e.getMessage());
         }
     }
 
