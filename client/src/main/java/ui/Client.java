@@ -96,8 +96,8 @@ public class Client extends WebSocketAdapter {
 
             switch (serverMessage.getServerMessageType()) {
                 case LOAD_GAME -> loadGame(gson.fromJson(messege, LoadGameMessage.class));
-                case NOTIFICATION -> notification(gson.fromJson(messege, LoadGameMessage.class));
-                case ERROR -> handleError(gson.fromJson(messege, LoadGameMessage.class));
+                case NOTIFICATION -> notification(gson.fromJson(messege, NotificationMessage.class));
+                case ERROR -> handleError(gson.fromJson(messege, ErrorMessage.class));
             }
         } catch (Exception e) {
             System.out.println("error handling socket message " + messege);
@@ -119,6 +119,16 @@ public class Client extends WebSocketAdapter {
             showBoard(team != null ? team : ChessGame.TeamColor.WHITE);
         }
 
+    }
+
+    public void sendCommand(UserGameCommand command)
+    {
+        try{
+            if (session != null)
+            {
+                
+            }
+        }
     }
 
     public void run() {
