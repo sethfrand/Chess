@@ -183,10 +183,18 @@ public class Client extends WebSocketAdapter {
             case ("help") -> inGameHelp();
             case ("redraw") -> redoBoard();
             case ("leave") -> exitGame();
-            case ("move") -> System.out.println("Doing this later");
+            case ("move") -> makeMove(string);
             case ("resign") -> resignGame();
             case ("highlight") -> System.out.println("this will highlight all the moves that the player can make");
             default -> System.out.println("command " + command + " unknown, type 'help' for a list of commands");
+        }
+    }
+
+    private void makeMove(String[] parts) throws Exception {
+        if (parts.length != 3) {
+            System.out.println("incorrect arguments, please use move <from> <to>");
+            System.out.println("and example could be move <e3> <e4>");
+            return;
         }
     }
 
@@ -345,7 +353,8 @@ public class Client extends WebSocketAdapter {
 
                     try {
                         connectWebsocket();
-
+                        UserGameCommand join = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+                        sendCommand(join);
 
                     } catch (Exception e) {
                         System.out.println("Error connecting to the game " + e.getMessage());
@@ -369,14 +378,13 @@ public class Client extends WebSocketAdapter {
             return;
         }
 
-
         try {
             int gameID = Integer.parseInt(parts[1]);
 
             curGame = facade.getGame(gameID, authToken);
             System.out.println("now observing " + gameID);
             state = ClientState.GAMING;
-
+            team = null;
             try {
                 connectWebsocket();
                 UserGameCommand connect = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
