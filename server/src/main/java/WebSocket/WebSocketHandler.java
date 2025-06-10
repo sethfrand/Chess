@@ -28,6 +28,7 @@ public class WebSocketHandler {
     private static final ConcurrentHashMap<Integer, CopyOnWriteArrayList<Session>> sessions = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<Session, String> sessionToAuth = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<Session, Integer> sessionToGame = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Integer, Boolean> resignedGames = new ConcurrentHashMap<>();
 
     private final Gson gson = new Gson();
     private final GameService gameService;
@@ -75,7 +76,8 @@ public class WebSocketHandler {
 
         ChessGame chessGame = game.getGame();
         if (chessGame.isInCheckmate(ChessGame.TeamColor.WHITE) || chessGame.isInStalemate(ChessGame.TeamColor.WHITE)
-                || chessGame.isInCheckmate(ChessGame.TeamColor.BLACK) || chessGame.isInStalemate(ChessGame.TeamColor.BLACK)) {
+                || chessGame.isInCheckmate(ChessGame.TeamColor.BLACK) || chessGame.isInStalemate(ChessGame.TeamColor.BLACK)
+                || resignedGames.getOrDefault(gameID, false)) {
             sendError(session, "game is already over, you can't make a move");
             return;
         }
