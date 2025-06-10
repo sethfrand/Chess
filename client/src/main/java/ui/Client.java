@@ -210,7 +210,7 @@ public class Client extends WebSocketAdapter {
 
             ChessMove move = new ChessMove(fromPos, toPos, null);
             UserGameCommand moveCommand = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, curGame.getGameID(), move);
-            moveCommand.move(move);
+            sendCommand(moveCommand);
 
         } catch (Exception e) {
             System.out.println("Error making a move " + e.getMessage());

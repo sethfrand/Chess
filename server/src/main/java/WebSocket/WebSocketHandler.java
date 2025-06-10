@@ -1,6 +1,8 @@
 package WebSocket;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
@@ -78,7 +80,67 @@ public class WebSocketHandler {
             return;
         }
 
+        boolean isWhite = username.equals(game.getWhiteUsername());
+        boolean isBlack = username.equals(game.getBlackUsername());
 
+        if (!isWhite && !isBlack) {
+            System.out.println("Error: an observer cannot make a move ");
+            return;
+        }
+
+        ChessGame.TeamColor nowTurn = chessGame.getTeamTurn();
+        ChessGame.TeamColor playerColor = isWhite ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+
+        ChessMove move = command.getMove();
+        if (move == null) {
+            System.out.println("no move ");
+            return;
+        }
+
+        if (nowTurn != playerColor) {
+            System.out.println("not your turn");
+            return;
+        }
+
+        try {
+            chessGame.makeMove(move);
+            GameData updatedGame = new GameData(gameID, game.getWhiteUsername(), game.getBlackUsername(), game.getGameName(), chessGame);
+            gameService.updateGame(gameID, updatedGame);
+
+            LoadGameMessage load = new LoadGameMessage(chessGame);
+            project(gameID, load);
+            ChessGame.TeamColor oppoColor = (playerColor == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE);
+
+            if (chessGame.isInCheckmate(oppoColor)) {
+                String mate = username + " wins the match! ";
+                project(gameID, new NotificationMessage(mate));
+            } else if (chessGame.isInStalemate(oppoColor)) {
+                String stale = "stalemate, there is no winner";
+                project(gameID, new NotificationMessage(stale));
+            } else if (chessGame.isInCheck(oppoColor)) {
+                String check = oppoColor.toString().toLowerCase() + "is in check ";
+                project(gameID, new NotificationMessage(check));
+            }
+
+            String notifyOthers = username + " just made a move.";
+            broadcastNotification(gameID, session, notifyOthers);
+            
+        } catch (InvalidMoveException e) {
+            System.out.println("invalid move" + e.getMessage());
+        }
+
+    }
+
+
+    private void project(int gameID, ServerMessage messege) {
+        CopyOnWriteArrayList<Session> gameSession = sessions.get(gameID);
+        if (gameSession != null) {
+            for (Session session : gameSession) {
+                if (session.isOpen()) {
+                    sendMessage(session, messege);
+                }
+            }
+        }
     }
 
     private void resign(Session session, UserGameCommand command) throws Exception {
