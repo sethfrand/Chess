@@ -208,28 +208,56 @@ public class Client extends WebSocketAdapter {
                 return;
             }
 
-            ChessMove move = new ChessMove(from, to, null);
-            UserGameCommand moveCommand = new UserGameCommand(authToken, curGame.getGameID());
-            sendCommand(moveCommand);
+            ChessMove move = new ChessMove(fromPos, toPos, null);
+            UserGameCommand moveCommand = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, curGame.getGameID(), move);
+            moveCommand.move(move);
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            System.out.println("Error making a move " + e.getMessage());
         }
     }
 
+    static boolean isValidMove(int row, int col) {
+        return (col < 1 || col > 8 || row < 1 || row > 8);
+    }
+
     private ChessPosition convertPos(String from) {
-        
+        if (from == null || from.length() != 2) {
+            return null;
+        }
+        char colChar = from.charAt(0);
+        char rowChar = from.charAt(1);
+
+
+        int col = colChar - 'a' + 1;
+        int row = rowChar - '0';
+
+        if (isValidMove(row, col)) {
+            return null;
+        }
+        return new ChessPosition(row, col);
     }
 
     private void redoBoard() {
-        System.out.println("Implementing later");
+        if (curGame != null) {
+            showBoard(team != null ? team : ChessGame.TeamColor.WHITE);
+        } else {
+            System.out.println("no game to show");
+        }
     }
 
     private void exitGame() {
-        curGame = null;
-        team = null;
-        state = ClientState.LOGGED_IN;
-        System.out.println("leaving the game....");
+        if (curGame != null) {
+            UserGameCommand leave = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, curGame.getGameID(), null);
+            sendCommand(leave);
+
+            webSocketDisconnect();
+            curGame = null;
+            team = null;
+            state = ClientState.LOGGED_IN;
+            System.out.println("leaving the game....");
+        }
+
     }
 
 
@@ -426,7 +454,7 @@ public class Client extends WebSocketAdapter {
         try {
             UserGameCommand resign = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, curGame.getGameID());
             sendCommand(resign);
-
+            System.out.println("Resigning from " + curGame);
         } catch (Exception e) {
             System.out.println("Error resigning from game " + e.getMessage());
         }
