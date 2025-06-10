@@ -84,7 +84,7 @@ public class WebSocketHandler {
         boolean isBlack = username.equals(game.getBlackUsername());
 
         if (!isWhite && !isBlack) {
-            System.out.println("Error: an observer cannot make a move ");
+            sendError(session, "Error: an observer cannot make a move ");
             return;
         }
 
@@ -93,12 +93,12 @@ public class WebSocketHandler {
 
         ChessMove move = command.getMove();
         if (move == null) {
-            System.out.println("no move ");
+            sendError(session, "no move given ");
             return;
         }
 
         if (nowTurn != playerColor) {
-            System.out.println("not your turn");
+            sendError(session, "not your turn");
             return;
         }
 
@@ -124,9 +124,9 @@ public class WebSocketHandler {
 
             String notifyOthers = username + " just made a move.";
             broadcastNotification(gameID, session, notifyOthers);
-            
+
         } catch (InvalidMoveException e) {
-            System.out.println("invalid move" + e.getMessage());
+            sendError(session, "invalid move" + e.getMessage());
         }
 
     }
