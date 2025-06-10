@@ -189,6 +189,29 @@ public class WebSocketHandler {
         int gameID = command.getGameID();
 
         if (username != null) {
+
+            GameData game = gameService.getGame(gameID);
+            if (game != null) {
+                String newWhite = game.getWhiteUsername();
+                String newBlack = game.getBlackUsername();
+                Boolean player = false;
+
+                if (username.equals(game.getWhiteUsername())) {
+                    newWhite = null;
+                    player = true;
+                }
+
+                if (username.equals(game.getBlackUsername())) {
+                    newBlack = null;
+                    player = true;
+                }
+
+                if (player) {
+                    GameData updated = new GameData(gameID, newWhite, newBlack, game.getGameName(), game.getGame());
+                    gameService.updateGame(gameID, updated);
+                    resignedGames.remove(gameID);
+                }
+            }
             removeSessionFromGame(gameID, session);
             sessionToAuth.remove(session);
             sessionToGame.remove(session);
