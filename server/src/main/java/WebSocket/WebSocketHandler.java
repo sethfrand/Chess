@@ -174,6 +174,7 @@ public class WebSocketHandler {
             return;
         }
 
+        resignedGames.put(gameID, true);
         String resigned = "the player " + username + " has resigned from the game";
         broadcastNotification(gameID, session, resigned);
 
