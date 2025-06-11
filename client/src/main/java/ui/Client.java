@@ -1,26 +1,21 @@
 package ui;
 
 import chess.*;
-//import dataaccess.DataAccessException;
 import model.GameData;
 
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.WebSocket;
+import java.util.concurrent.CompletionStage;
 
 import com.google.gson.Gson;
-import org.eclipse.jetty.server.Authentication;
-import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.WebSocketAdapter;
-import org.eclipse.jetty.websocket.client.WebSocketClient;
-
 import websocket.commands.UserGameCommand;
 import websocket.messages.*;
 
-
 import java.util.Collection;
-import java.util.Objects;
 import java.util.Scanner;
 
-public class Client extends WebSocketAdapter {
+public class Client implements WebSocket.Listener {
     private final Scanner scanner;
     private final ServerFacade facade;
     private String authToken;
@@ -29,11 +24,8 @@ public class Client extends WebSocketAdapter {
     private GameData curGame;
     private ChessGame.TeamColor team;
 
-    private WebSocketClient client;
-    private Session session;
-
+    private WebSocket webSocket;
     private final Gson gson = new Gson();
-
 
     public Client(String serverURL) {
         this.scanner = new Scanner(System.in);
@@ -51,25 +43,19 @@ public class Client extends WebSocketAdapter {
     }
 
     private void connectWebsocket() throws Exception {
-        if (client == null) {
-            client = new WebSocketClient();
-            client.start();
-        }
-
         String socketURL = facade.getServerUrl().replace("http://", "ws://") + "/ws";
-        URI uriServer = new URI(socketURL);
+        URI uri = URI.create(socketURL);
 
-        session = client.connect(this, uriServer).get();
+        HttpClient client = HttpClient.newHttpClient();
+        webSocket = client.newWebSocketBuilder()
+                .buildAsync(uri, this)
+                .join();
     }
 
     public void webSocketDisconnect() {
         try {
-            if (session != null && session.isOpen()) {
-                session.close();
-            }
-            if (client != null) {
-                client.stop();
-                client = null;
+            if (webSocket != null) {
+                webSocket.sendClose(WebSocket.NORMAL_CLOSURE, "Closing connection");
             }
         } catch (Exception e) {
             System.out.println("Error disconnecting socket. " + e.getMessage());
@@ -77,20 +63,28 @@ public class Client extends WebSocketAdapter {
     }
 
     @Override
-    public void onWebSocketText(String message) {
-        handleSocket(message);
+    public void onOpen(WebSocket webSocket) {
+        System.out.println("WebSocket connection opened");
+        WebSocket.Listener.super.onOpen(webSocket);
     }
 
     @Override
-    public void onWebSocketClose(int session, String why) {
-        System.out.println("Socket closed " + why);
+    public CompletionStage<?> onText(WebSocket webSocket, CharSequence data, boolean last) {
+        handleSocket(data.toString());
+        return WebSocket.Listener.super.onText(webSocket, data, last);
     }
 
     @Override
-    public void onWebSocketError(Throwable why) {
-        System.out.println("Error with socket " + why.getMessage());
+    public CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason) {
+        System.out.println("Socket closed: " + reason);
+        return WebSocket.Listener.super.onClose(webSocket, statusCode, reason);
     }
 
+    @Override
+    public void onError(WebSocket webSocket, Throwable error) {
+        System.out.println("Error with socket: " + error.getMessage());
+        WebSocket.Listener.super.onError(webSocket, error);
+    }
 
     void handleSocket(String messege) {
         try {
@@ -120,14 +114,13 @@ public class Client extends WebSocketAdapter {
                     curGame.getGameName(), messege.getGame());
             showBoard(team != null ? team : ChessGame.TeamColor.WHITE);
         }
-
     }
 
     public void sendCommand(UserGameCommand command) {
         try {
-            if (session.isOpen() && session != null) {
+            if (webSocket != null) {
                 String json = gson.toJson(command);
-                session.getRemote().sendString(json);
+                webSocket.sendText(json, true);
             }
         } catch (Exception e) {
             System.out.println("Error sending the command " + e.getMessage());
@@ -174,7 +167,6 @@ public class Client extends WebSocketAdapter {
             logInCommands(command, string);
         } else {
             inGameCommands(command, string);
-
         }
         //handle commands when logged in
     }
@@ -204,7 +196,6 @@ public class Client extends WebSocketAdapter {
             ChessPosition fromPos = convertPos(from);
             ChessPosition toPos = convertPos(to);
 
-
             if (fromPos == null || toPos == null) {
                 System.out.println("invalid, please use the correct format like 'e1' or 'e2' ");
                 return;
@@ -229,7 +220,6 @@ public class Client extends WebSocketAdapter {
         }
         char colChar = from.charAt(0);
         char rowChar = from.charAt(1);
-
 
         int col = colChar - 'a' + 1;
         int row = rowChar - '0';
@@ -264,7 +254,6 @@ public class Client extends WebSocketAdapter {
             Collection<ChessMove> moves = curGame.getGame().validMoves(square);
             if (moves.isEmpty()) {
                 System.out.println("no valid moves for piece at " + square);
-
             }
 
             System.out.println("valid moves for " + piece.getPieceType() + " located on " + square + "");
@@ -279,8 +268,6 @@ public class Client extends WebSocketAdapter {
         } catch (Exception e) {
             System.out.println("Error highlighting moves " + e.getMessage());
         }
-
-
     }
 
     private void showBrightBoard(ChessGame.TeamColor perspective, ChessPosition square, Collection<ChessMove> moves) {
@@ -294,7 +281,6 @@ public class Client extends WebSocketAdapter {
     private String positiontoString(ChessPosition endPosition) {
         char col = (char) ('a' + endPosition.getColumn() - 1);
         return "" + col + endPosition.getRow();
-
     }
 
     private void redoBoard() {
@@ -316,9 +302,7 @@ public class Client extends WebSocketAdapter {
             state = ClientState.LOGGED_IN;
             System.out.println("leaving the game....");
         }
-
     }
-
 
     private void logOutCommands(String command, String[] string) throws Exception {
         switch (command) {
@@ -339,7 +323,6 @@ public class Client extends WebSocketAdapter {
             case ("observe") -> observeGame(string);
             default -> System.out.println("command " + command + "unknown, type 'help' for a list of commands");
         }
-
     }
 
     private void login(String[] parts) throws Exception {
@@ -355,8 +338,6 @@ public class Client extends WebSocketAdapter {
             curUser = username;
             state = ClientState.LOGGED_IN;
             System.out.println("logging in as " + username);
-
-
         } else {
             System.out.println("failed login");
         }
@@ -376,7 +357,6 @@ public class Client extends WebSocketAdapter {
             curUser = username;
             state = ClientState.LOGGED_IN;
             System.out.println("registered and logging in as " + username);
-
         } else {
             System.out.println("failed registration ");
         }
@@ -433,7 +413,6 @@ public class Client extends WebSocketAdapter {
             int gameID = Integer.parseInt(parts[1]);
             String color = parts[2].toUpperCase();
 
-
             if (!color.equals("WHITE") && !color.equals("BLACK")) {
                 System.out.println("color must be WHITE or BLACK");
                 return;
@@ -459,7 +438,6 @@ public class Client extends WebSocketAdapter {
                     team = color.equals("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
                     System.out.println("You have joined " + gameID + " successfully!, you will be playing as " + team);
                     state = ClientState.GAMING;
-
 
                     try {
                         connectWebsocket();
@@ -510,7 +488,6 @@ public class Client extends WebSocketAdapter {
     }
 
     public void resignGame() {
-
         System.out.println("Please type 'yes' or 'y' to confirm your resignation from the game ");
 
         try {
@@ -521,7 +498,6 @@ public class Client extends WebSocketAdapter {
             System.out.println("Error resigning from game " + e.getMessage());
         }
     }
-
 
     private void loginHelp() {
         System.out.println("The available commands are..");
@@ -550,7 +526,6 @@ public class Client extends WebSocketAdapter {
         System.out.println("highlight");
     }
 
-
     private void showBoard(ChessGame.TeamColor team) {
         if (curGame != null && curGame.getGame() != null) {
             ChessBoard board = curGame.getGame().getBoard();
@@ -566,6 +541,4 @@ public class Client extends WebSocketAdapter {
         LOGGED_IN,
         GAMING
     }
-
-
 }
