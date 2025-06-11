@@ -23,7 +23,6 @@ public class Client implements WebSocket.Listener {
     private ClientState state;
     private GameData curGame;
     private ChessGame.TeamColor team;
-
     private WebSocket webSocket;
     private final Gson gson = new Gson();
 
@@ -250,7 +249,6 @@ public class Client implements WebSocket.Listener {
                 System.out.println("There is no piece at " + posString);
                 return;
             }
-
             Collection<ChessMove> moves = curGame.getGame().validMoves(square);
             if (moves.isEmpty()) {
                 System.out.println("no valid moves for piece at " + square);
@@ -262,9 +260,7 @@ public class Client implements WebSocket.Listener {
                 System.out.println(moveStr + " ");
             }
             System.out.println();
-
             showBrightBoard(team != null ? team : ChessGame.TeamColor.WHITE, square, moves);
-
         } catch (Exception e) {
             System.out.println("Error highlighting moves " + e.getMessage());
         }
@@ -332,7 +328,6 @@ public class Client implements WebSocket.Listener {
         }
         String username = parts[1];
         String password = parts[2];
-
         authToken = facade.login(username, password);
         if (authToken != null) {
             curUser = username;
@@ -351,7 +346,6 @@ public class Client implements WebSocket.Listener {
         String username = parts[1];
         String password = parts[2];
         String email = parts[3];
-
         authToken = facade.register(username, password, email);
         if (authToken != null) {
             curUser = username;
@@ -412,18 +406,15 @@ public class Client implements WebSocket.Listener {
         try {
             int gameID = Integer.parseInt(parts[1]);
             String color = parts[2].toUpperCase();
-
             if (!color.equals("WHITE") && !color.equals("BLACK")) {
                 System.out.println("color must be WHITE or BLACK");
                 return;
             }
-
             GameData gameData = facade.getGame(gameID, authToken);
             if (gameData == null) {
                 System.out.println("No game");
                 return;
             }
-
             if (color.equals("WHITE") && gameData.getWhiteUsername() != null) {
                 System.out.println("The white user is already taken");
                 return;
@@ -438,16 +429,13 @@ public class Client implements WebSocket.Listener {
                     team = color.equals("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
                     System.out.println("You have joined " + gameID + " successfully!, you will be playing as " + team);
                     state = ClientState.GAMING;
-
                     try {
                         connectWebsocket();
                         UserGameCommand join = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
                         sendCommand(join);
-
                     } catch (Exception e) {
                         System.out.println("Error connecting to the game " + e.getMessage());
                     }
-
                     showBoard(team);
                 } else {
                     System.out.println("You have joined " + gameID + " unsuccessfully!, one of the colors may be taken");
@@ -465,7 +453,6 @@ public class Client implements WebSocket.Listener {
             System.out.println("incorrect arguments, please use observe <game_id> ");
             return;
         }
-
         try {
             int gameID = Integer.parseInt(parts[1]);
 
@@ -477,7 +464,6 @@ public class Client implements WebSocket.Listener {
                 connectWebsocket();
                 UserGameCommand connect = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
                 sendCommand(connect);
-
             } catch (Exception e) {
                 System.out.println("Error connecting to game to observe " + e.getMessage());
             }
@@ -489,7 +475,6 @@ public class Client implements WebSocket.Listener {
 
     public void resignGame() {
         System.out.println("Please type 'yes' or 'y' to confirm your resignation from the game ");
-
         try {
             UserGameCommand resign = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, curGame.getGameID());
             sendCommand(resign);
