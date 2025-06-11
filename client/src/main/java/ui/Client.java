@@ -47,9 +47,7 @@ public class Client implements WebSocket.Listener {
         URI uri = URI.create(socketURL);
 
         HttpClient client = HttpClient.newHttpClient();
-        webSocket = client.newWebSocketBuilder()
-                .buildAsync(uri, this)
-                .join();
+        webSocket = client.newWebSocketBuilder().buildAsync(uri, this).join();
     }
 
     public void webSocketDisconnect() {
@@ -110,8 +108,7 @@ public class Client implements WebSocket.Listener {
 
     public void loadGame(LoadGameMessage messege) {
         if (messege.getGame() != null) {
-            curGame = new GameData(curGame.getGameID(), curGame.getWhiteUsername(), curGame.getBlackUsername(),
-                    curGame.getGameName(), messege.getGame());
+            curGame = new GameData(curGame.getGameID(), curGame.getWhiteUsername(), curGame.getBlackUsername(), curGame.getGameName(), messege.getGame());
             showBoard(team != null ? team : ChessGame.TeamColor.WHITE);
         }
     }
