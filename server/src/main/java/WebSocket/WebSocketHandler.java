@@ -169,7 +169,8 @@ public class WebSocketHandler {
         ChessGame chessGame = game.getGame();
 
         if (chessGame.isInCheckmate(ChessGame.TeamColor.WHITE) || chessGame.isInStalemate(ChessGame.TeamColor.WHITE)
-                || chessGame.isInCheckmate(ChessGame.TeamColor.BLACK) || chessGame.isInStalemate(ChessGame.TeamColor.BLACK)) {
+                || chessGame.isInCheckmate(ChessGame.TeamColor.BLACK) || chessGame.isInStalemate(ChessGame.TeamColor.BLACK)
+                || resignedGames.getOrDefault(gameID, false)) {
             sendError(session, "game is already over, you can't resign");
             return;
         }
