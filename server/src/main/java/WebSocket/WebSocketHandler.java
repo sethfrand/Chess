@@ -181,7 +181,6 @@ public class WebSocketHandler {
 
         NotificationMessage notify = new NotificationMessage("you have resigned from the game");
         sendMessage(session, notify);
-
     }
 
     private void leave(Session session, UserGameCommand command) throws Exception {

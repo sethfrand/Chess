@@ -17,6 +17,7 @@ import websocket.messages.*;
 
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Client extends WebSocketAdapter {
@@ -509,10 +510,13 @@ public class Client extends WebSocketAdapter {
     }
 
     public void resignGame() {
+
+        System.out.println("Please type 'yes' or 'y' to confirm your resignation from the game ");
+
         try {
             UserGameCommand resign = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, curGame.getGameID());
             sendCommand(resign);
-            System.out.println("Resigning from " + curGame);
+            System.out.println("Resigning from the game");
         } catch (Exception e) {
             System.out.println("Error resigning from game " + e.getMessage());
         }
