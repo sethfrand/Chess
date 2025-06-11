@@ -476,15 +476,19 @@ public class Client implements WebSocket.Listener {
 
     public void resignGame() {
         System.out.println("Please type 'yes' or 'y' to confirm your resignation from the game ");
-        try {
-            UserGameCommand resign = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, curGame.getGameID());
-            sendCommand(resign);
-            System.out.println("Resigning from the game");
-        } catch (Exception e) {
-            System.out.println("Error resigning from game " + e.getMessage());
+        String confirm = scanner.nextLine().trim().toLowerCase();
+        if (confirm.equals("y") || confirm.equals("yes")) {
+            try {
+                UserGameCommand resign = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, curGame.getGameID());
+                sendCommand(resign);
+                System.out.println("Resigning from the game");
+            } catch (Exception e) {
+                System.out.println("Error resigning from game " + e.getMessage());
+            }
+        } else {
+            System.out.println("Resignation cancelled");
         }
     }
-
 
     private void showBoard(ChessGame.TeamColor team) {
         if (curGame != null && curGame.getGame() != null) {
