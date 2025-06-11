@@ -1,4 +1,4 @@
-package WebSocket;
+package websocket;
 
 import chess.ChessGame;
 import chess.ChessMove;
@@ -25,10 +25,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @WebSocket
 public class WebSocketHandler {
-    private static final ConcurrentHashMap<Integer, CopyOnWriteArrayList<Session>> sessions = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<Session, String> sessionToAuth = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<Session, Integer> sessionToGame = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<Integer, Boolean> resignedGames = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Integer, CopyOnWriteArrayList<Session>> SESSIONS = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Session, String> SESSION_TO_AUTH = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Session, Integer> SESSION_TO_GAME = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Integer, Boolean> RESIGNED_GAMES = new ConcurrentHashMap<>();
 
     private final Gson gson = new Gson();
     private final GameService gameService;
@@ -77,7 +77,7 @@ public class WebSocketHandler {
         ChessGame chessGame = game.getGame();
         if (chessGame.isInCheckmate(ChessGame.TeamColor.WHITE) || chessGame.isInStalemate(ChessGame.TeamColor.WHITE)
                 || chessGame.isInCheckmate(ChessGame.TeamColor.BLACK) || chessGame.isInStalemate(ChessGame.TeamColor.BLACK)
-                || resignedGames.getOrDefault(gameID, false)) {
+                || RESIGNED_GAMES.getOrDefault(gameID, false)) {
             sendError(session, "game is already over, you can't make a move");
             return;
         }
@@ -135,7 +135,7 @@ public class WebSocketHandler {
 
 
     private void project(int gameID, ServerMessage messege) {
-        CopyOnWriteArrayList<Session> gameSession = sessions.get(gameID);
+        CopyOnWriteArrayList<Session> gameSession = SESSIONS.get(gameID);
         if (gameSession != null) {
             for (Session session : gameSession) {
                 if (session.isOpen()) {
@@ -170,12 +170,12 @@ public class WebSocketHandler {
 
         if (chessGame.isInCheckmate(ChessGame.TeamColor.WHITE) || chessGame.isInStalemate(ChessGame.TeamColor.WHITE)
                 || chessGame.isInCheckmate(ChessGame.TeamColor.BLACK) || chessGame.isInStalemate(ChessGame.TeamColor.BLACK)
-                || resignedGames.getOrDefault(gameID, false)) {
+                || RESIGNED_GAMES.getOrDefault(gameID, false)) {
             sendError(session, "game is already over, you can't resign");
             return;
         }
 
-        resignedGames.put(gameID, true);
+        RESIGNED_GAMES.put(gameID, true);
         String resigned = "the player " + username + " has resigned from the game";
         broadcastNotification(gameID, session, resigned);
 
@@ -209,12 +209,12 @@ public class WebSocketHandler {
                 if (player) {
                     GameData updated = new GameData(gameID, newWhite, newBlack, game.getGameName(), game.getGame());
                     gameService.updateGame(gameID, updated);
-                    resignedGames.remove(gameID);
+                    RESIGNED_GAMES.remove(gameID);
                 }
             }
             removeSessionFromGame(gameID, session);
-            sessionToAuth.remove(session);
-            sessionToGame.remove(session);
+            SESSION_TO_AUTH.remove(session);
+            SESSION_TO_GAME.remove(session);
             String leaving = username + " left the game";
             broadcastNotification(gameID, session, leaving);
 
@@ -235,8 +235,8 @@ public class WebSocketHandler {
 
     @OnWebSocketClose
     public void onClose(Session session, int status, String why) {
-        String authToken = sessionToAuth.remove(session);
-        Integer gameId = sessionToGame.remove(session);
+        String authToken = SESSION_TO_AUTH.remove(session);
+        Integer gameId = SESSION_TO_GAME.remove(session);
 
         if (gameId != null) {
             removeSessionFromGame(gameId, session);
@@ -272,8 +272,8 @@ public class WebSocketHandler {
                 return;
             }
 
-            sessionToAuth.put(session, authToken);
-            sessionToGame.put(session, gameID);
+            SESSION_TO_AUTH.put(session, authToken);
+            SESSION_TO_GAME.put(session, gameID);
             addSession(gameID, session);
             LoadGameMessage loadMessage = new LoadGameMessage(gameData.getGame());
             sendMessage(session, loadMessage);
@@ -304,12 +304,12 @@ public class WebSocketHandler {
     }
 
     private void addSession(int gameID, Session session) {
-        sessions.computeIfAbsent(gameID, i -> new CopyOnWriteArrayList<>()).add(session);
+        SESSIONS.computeIfAbsent(gameID, i -> new CopyOnWriteArrayList<>()).add(session);
     }
 
     private void broadcastNotification(Integer gameId, Session ExcludeSession, String message) {
         NotificationMessage notification = new NotificationMessage(message);
-        CopyOnWriteArrayList<Session> gameSession = sessions.get(gameId);
+        CopyOnWriteArrayList<Session> gameSession = SESSIONS.get(gameId);
         if (gameSession != null) {
             for (Session session : gameSession) {
                 if (session != ExcludeSession) {
@@ -331,11 +331,11 @@ public class WebSocketHandler {
     }
 
     private void removeSessionFromGame(Integer gameId, Session session) {
-        CopyOnWriteArrayList<Session> gameSessions = sessions.get(gameId);
+        CopyOnWriteArrayList<Session> gameSessions = SESSIONS.get(gameId);
         if (gameSessions != null) {
             gameSessions.remove(session);
             if (gameSessions.isEmpty()) {
-                sessions.remove(gameId);
+                SESSIONS.remove(gameId);
             }
 
         }
