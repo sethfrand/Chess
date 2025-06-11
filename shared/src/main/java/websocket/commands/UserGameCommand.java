@@ -19,6 +19,7 @@ public class UserGameCommand {
 
     private final Integer gameID;
 
+    public ChessMove move;
 
     public UserGameCommand(CommandType commandType, String authToken, Integer gameID) {
         this(commandType, authToken, gameID, null);
@@ -29,10 +30,9 @@ public class UserGameCommand {
         this.commandType = commandType;
         this.authToken = authToken;
         this.gameID = gameID;
+        this.move = move;
     }
-
-    public void move(ChessMove move) {
-    }
+    
 
     public enum CommandType {
         CONNECT,
@@ -54,9 +54,11 @@ public class UserGameCommand {
     }
 
     public ChessMove getMove() {
+        return move;
     }
 
     public void setMove(ChessMove move) {
+        this.move = move;
     }
 
     @Override
