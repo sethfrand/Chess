@@ -230,10 +230,6 @@ public class Client implements WebSocket.Listener {
 
     }
 
-    static boolean isValidMove(int row, int col) {
-        return (col < 1 || col > 8 || row < 1 || row > 8);
-    }
-
     private void highlightSquares(String[] parts) {
         if (parts.length != 2) {
             System.out.println("incorrect arguments, use correct format: highlight <position>");

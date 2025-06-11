@@ -2,7 +2,6 @@ package ui;
 
 import chess.ChessPosition;
 
-import static ui.Client.isValidMove;
 
 public class ConvertPos {
     public static ChessPosition convertPos(String from) {
@@ -19,5 +18,9 @@ public class ConvertPos {
             return null;
         }
         return new ChessPosition(row, col);
+    }
+
+    static boolean isValidMove(int row, int col) {
+        return (col < 1 || col > 8 || row < 1 || row > 8);
     }
 }
