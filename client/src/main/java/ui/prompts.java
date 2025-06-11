@@ -10,6 +10,22 @@ public class prompts {
         }
     }
 
+    public static void welcome() {
+        System.out.println("Welcome to the Chess game");
+        System.out.print("Type 'help' to get a list of commands!");
+        System.out.println();
+    }
+
+    public static void promoOptions() {
+        System.out.println("Choose a piece to Promote");
+        System.out.println("Queen");
+        System.out.println("Rook");
+        System.out.println("Bishop");
+        System.out.println("Knight");
+        System.out.println("Please enter the first letter of the piece you would like, if no piece is chosen, a queen will be given");
+
+    }
+
     public static void loginHelp() {
         System.out.println("The available commands are..");
         System.out.println(" create <game_name> --This creates a new game");
@@ -36,6 +52,7 @@ public class prompts {
         System.out.println("move");
         System.out.println("highlight");
     }
+
 
     public enum ClientState {
         LOGGED_OUT,

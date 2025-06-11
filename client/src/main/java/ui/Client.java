@@ -16,8 +16,6 @@ import ui.prompts.ClientState;
 import java.util.Collection;
 import java.util.Scanner;
 
-import static ui.prompts.logOutHelp;
-
 public class Client implements WebSocket.Listener {
     private final Scanner scanner;
     private final ServerFacade facade;
@@ -130,12 +128,10 @@ public class Client implements WebSocket.Listener {
     }
 
     public void run() {
-        System.out.println("Welcome to the Chess game");
-        System.out.print("Type 'help' to get a list of commands!");
-        System.out.println();
+        prompts.welcome();
 
         while (true) {
-            printPrompt();
+            prompts.printPrompt(state, curUser);
             String input = scanner.nextLine().trim();
             if (input.equalsIgnoreCase("quit")) {
                 System.out.println("Quitting");
@@ -146,15 +142,6 @@ public class Client implements WebSocket.Listener {
             } catch (Exception e) {
                 System.out.println("Error " + e.getMessage());
             }
-        }
-    }
-
-    void printPrompt() {
-        if (state == ClientState.LOGGED_OUT) {
-            System.out.print("Logged out....");
-            System.out.println(" ");
-        } else {
-            System.out.println("[" + curUser + "].....");
         }
     }
 
@@ -203,10 +190,8 @@ public class Client implements WebSocket.Listener {
                 return;
             }
 
-
             ChessPiece piece = curGame.getGame().getBoard().getPiece(fromPos);
             ChessPiece.PieceType promoPiece = null;
-
 
             if (piece != null && piece.getPieceType() == ChessPiece.PieceType.PAWN) {
                 boolean promo = false;
@@ -223,8 +208,6 @@ public class Client implements WebSocket.Listener {
                     }
                 }
             }
-
-
             ChessMove move = new ChessMove(fromPos, toPos, null);
             UserGameCommand moveCommand = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, curGame.getGameID(), move);
             sendCommand(moveCommand);
@@ -235,15 +218,8 @@ public class Client implements WebSocket.Listener {
     }
 
     private ChessPiece.PieceType getPromoPiece() {
-        System.out.println("Choose a piece to Promote");
-        System.out.println("Queen");
-        System.out.println("Rook");
-        System.out.println("Bishop");
-        System.out.println("Knight");
-        System.out.println("Please enter the first letter of the piece you would like, if no piece is chosen, a queen will be given");
-
+        prompts.promoOptions();
         String newPiece = scanner.nextLine().trim().toUpperCase();
-
         return switch (newPiece) {
             case "Q" -> ChessPiece.PieceType.QUEEN;
             case "R" -> ChessPiece.PieceType.ROOK;
