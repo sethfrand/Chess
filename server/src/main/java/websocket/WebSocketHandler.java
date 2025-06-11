@@ -19,6 +19,7 @@ import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -154,33 +155,62 @@ public class WebSocketHandler {
             return;
         }
         int gameID = command.getGameID();
-        GameData game = gameService.getGame(gameID);
+        GameData game;
 
-        if (game == null) {
-            sendError(session, "game does not exist");
+        try {
+            game = gameService.getGame(gameID);
+        } catch (Exception e) {
+            sendError(session, "Could not load game");
             return;
         }
+        boolean isWhite = Objects.equals(username, game.getWhiteUsername());
+        boolean isBlack = Objects.equals(username, game.getBlackUsername());
 
-        if (!username.equals(game.getWhiteUsername()) && !username.equals(game.getBlackUsername())) {
-            sendError(session, "you are not a player, you cant resign");
+        if (!isWhite && !isBlack) {
+            sendError(session, "you aren't a player you can't resign");
             return;
         }
 
         ChessGame chessGame = game.getGame();
+        boolean resigned = game.getWhiteUsername() == null || game.getBlackUsername() == null;
+        boolean gameOver = chessGame.isInCheckmate(ChessGame.TeamColor.BLACK) || chessGame.isInCheckmate(ChessGame.TeamColor.WHITE)
+                || chessGame.isInStalemate(ChessGame.TeamColor.WHITE) || chessGame.isInStalemate(ChessGame.TeamColor.BLACK)
+                || resigned;
 
-        if (chessGame.isInCheckmate(ChessGame.TeamColor.WHITE) || chessGame.isInStalemate(ChessGame.TeamColor.WHITE)
-                || chessGame.isInCheckmate(ChessGame.TeamColor.BLACK) || chessGame.isInStalemate(ChessGame.TeamColor.BLACK)
-                || RESIGNED_GAMES.getOrDefault(gameID, false)) {
-            sendError(session, "game is already over, you can't resign");
+        if (gameOver) {
+            sendError(session, "Error: game is already over");
             return;
         }
 
         RESIGNED_GAMES.put(gameID, true);
-        String resigned = "the player " + username + " has resigned from the game";
-        broadcastNotification(gameID, session, resigned);
 
-        NotificationMessage notify = new NotificationMessage("you have resigned from the game");
-        sendMessage(session, notify);
+        String newWhite = game.getWhiteUsername();
+        String newBlack = game.getBlackUsername();
+
+        if (isWhite) {
+            newWhite = null;
+        } else {
+            newBlack = null;
+        }
+        GameData updated = new GameData(gameID, newWhite, newBlack, game.getGameName(), game.getGame());
+
+        try {
+            gameService.updateGame(gameID, updated);
+        } catch (Exception e) {
+            sendError(session, "could not update game");
+            return;
+        }
+
+        String resignedMessege = username + "resigned from the game";
+        NotificationMessage notify = new NotificationMessage(resignedMessege);
+        project(gameID, notify);
+
+
+        //RESIGNED_GAMES.remove(gameID);
+        removeSessionFromGame(gameID, session);
+        SESSION_TO_AUTH.remove(session);
+        SESSION_TO_GAME.remove(session);
+
     }
 
     private void leave(Session session, UserGameCommand command) throws Exception {
