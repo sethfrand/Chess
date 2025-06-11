@@ -1,6 +1,6 @@
 package ui;
 
-public class prompts {
+public class Prompts {
     public static void printPrompt(ClientState state, String curUser) {
         if (state == ClientState.LOGGED_OUT) {
             System.out.print("Logged out....");

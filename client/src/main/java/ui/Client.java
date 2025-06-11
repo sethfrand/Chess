@@ -11,7 +11,7 @@ import java.util.concurrent.CompletionStage;
 import com.google.gson.Gson;
 import websocket.commands.UserGameCommand;
 import websocket.messages.*;
-import ui.prompts.ClientState;
+import ui.Prompts.ClientState;
 
 import java.util.Collection;
 import java.util.Scanner;
@@ -128,10 +128,10 @@ public class Client implements WebSocket.Listener {
     }
 
     public void run() {
-        prompts.welcome();
+        Prompts.welcome();
 
         while (true) {
-            prompts.printPrompt(state, curUser);
+            Prompts.printPrompt(state, curUser);
             String input = scanner.nextLine().trim();
             if (input.equalsIgnoreCase("quit")) {
                 System.out.println("Quitting");
@@ -162,7 +162,7 @@ public class Client implements WebSocket.Listener {
 
     private void inGameCommands(String command, String[] string) throws Exception {
         switch (command) {
-            case ("help") -> prompts.inGameHelp();
+            case ("help") -> Prompts.inGameHelp();
             case ("redraw") -> redoBoard();
             case ("leave") -> exitGame();
             case ("move") -> makeMove(string);
@@ -182,8 +182,8 @@ public class Client implements WebSocket.Listener {
             String from = parts[1].toLowerCase();
             String to = parts[2].toLowerCase();
 
-            ChessPosition fromPos = convertPos(from);
-            ChessPosition toPos = convertPos(to);
+            ChessPosition fromPos = ConvertPos.convertPos(from);
+            ChessPosition toPos = ConvertPos.convertPos(to);
 
             if (fromPos == null || toPos == null) {
                 System.out.println("invalid, please use the correct format like 'e1' or 'e2' ");
@@ -218,7 +218,7 @@ public class Client implements WebSocket.Listener {
     }
 
     private ChessPiece.PieceType getPromoPiece() {
-        prompts.promoOptions();
+        Prompts.promoOptions();
         String newPiece = scanner.nextLine().trim().toUpperCase();
         return switch (newPiece) {
             case "Q" -> ChessPiece.PieceType.QUEEN;
@@ -234,22 +234,6 @@ public class Client implements WebSocket.Listener {
         return (col < 1 || col > 8 || row < 1 || row > 8);
     }
 
-    private ChessPosition convertPos(String from) {
-        if (from == null || from.length() != 2) {
-            return null;
-        }
-        char colChar = from.charAt(0);
-        char rowChar = from.charAt(1);
-
-        int col = colChar - 'a' + 1;
-        int row = rowChar - '0';
-
-        if (isValidMove(row, col)) {
-            return null;
-        }
-        return new ChessPosition(row, col);
-    }
-
     private void highlightSquares(String[] parts) {
         if (parts.length != 2) {
             System.out.println("incorrect arguments, use correct format: highlight <position>");
@@ -258,7 +242,7 @@ public class Client implements WebSocket.Listener {
         }
         try {
             String posString = parts[1].toLowerCase();
-            ChessPosition square = convertPos(posString);
+            ChessPosition square = ConvertPos.convertPos(posString);
 
             if (square == null) {
                 System.out.println("invalid format, use correct format");
@@ -323,7 +307,7 @@ public class Client implements WebSocket.Listener {
 
     private void logOutCommands(String command, String[] string) throws Exception {
         switch (command) {
-            case ("help") -> prompts.logOutHelp();
+            case ("help") -> Prompts.logOutHelp();
             case ("login") -> login(string);
             case ("register") -> register(string);
             default -> System.out.println("command " + command + " unknown, type 'help' for a list of commands");
@@ -332,7 +316,7 @@ public class Client implements WebSocket.Listener {
 
     private void logInCommands(String command, String[] string) throws Exception {
         switch (command) {
-            case ("help") -> prompts.loginHelp();
+            case ("help") -> Prompts.loginHelp();
             case ("logout") -> logout();
             case ("create") -> createGame(string);
             case ("list") -> listGames();
