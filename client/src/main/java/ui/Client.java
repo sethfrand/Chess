@@ -108,7 +108,8 @@ public class Client implements WebSocket.Listener {
 
     public void loadGame(LoadGameMessage messege) {
         if (messege.getGame() != null) {
-            curGame = new GameData(curGame.getGameID(), curGame.getWhiteUsername(), curGame.getBlackUsername(), curGame.getGameName(), messege.getGame());
+            curGame = new GameData(curGame.getGameID(), curGame.getWhiteUsername(), curGame.getBlackUsername(),
+                    curGame.getGameName(), messege.getGame());
             showBoard(team != null ? team : ChessGame.TeamColor.WHITE);
         }
     }
