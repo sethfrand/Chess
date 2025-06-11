@@ -11,9 +11,12 @@ import java.util.concurrent.CompletionStage;
 import com.google.gson.Gson;
 import websocket.commands.UserGameCommand;
 import websocket.messages.*;
+import ui.prompts.ClientState;
 
 import java.util.Collection;
 import java.util.Scanner;
+
+import static ui.prompts.logOutHelp;
 
 public class Client implements WebSocket.Listener {
     private final Scanner scanner;
@@ -172,7 +175,7 @@ public class Client implements WebSocket.Listener {
 
     private void inGameCommands(String command, String[] string) throws Exception {
         switch (command) {
-            case ("help") -> inGameHelp();
+            case ("help") -> prompts.inGameHelp();
             case ("redraw") -> redoBoard();
             case ("leave") -> exitGame();
             case ("move") -> makeMove(string);
@@ -344,7 +347,7 @@ public class Client implements WebSocket.Listener {
 
     private void logOutCommands(String command, String[] string) throws Exception {
         switch (command) {
-            case ("help") -> logOutHelp();
+            case ("help") -> prompts.logOutHelp();
             case ("login") -> login(string);
             case ("register") -> register(string);
             default -> System.out.println("command " + command + " unknown, type 'help' for a list of commands");
@@ -353,7 +356,7 @@ public class Client implements WebSocket.Listener {
 
     private void logInCommands(String command, String[] string) throws Exception {
         switch (command) {
-            case ("help") -> loginHelp();
+            case ("help") -> prompts.loginHelp();
             case ("logout") -> logout();
             case ("create") -> createGame(string);
             case ("list") -> listGames();
@@ -526,32 +529,6 @@ public class Client implements WebSocket.Listener {
         }
     }
 
-    private void loginHelp() {
-        System.out.println("The available commands are..");
-        System.out.println(" create <game_name> --This creates a new game");
-        System.out.println(" join <game_id> <WHITE|BLACK> -- This will let you join a game");
-        System.out.println(" list - This will last all the games");
-        System.out.println(" observe <game_id> -- this allows you to observe a game");
-        System.out.println(" logout -- This will log you out");
-        System.out.println(" help -- this will display (this) help menu again ");
-    }
-
-    private void logOutHelp() {
-        System.out.println("The available commands are..");
-        System.out.println("  register <username> <password> <email> -- This will register you as a user");
-        System.out.println("  help -- this will display (this) help menu again");
-        System.out.println("  login <username> <password> -- this will log you in ");
-        System.out.println("  quit -- this will kill the program");
-    }
-
-    private void inGameHelp() {
-        System.out.println("The available commands are..");
-        System.out.println("resign");
-        System.out.println("redraw");
-        System.out.println("leave");
-        System.out.println("move");
-        System.out.println("highlight");
-    }
 
     private void showBoard(ChessGame.TeamColor team) {
         if (curGame != null && curGame.getGame() != null) {
@@ -561,11 +538,5 @@ public class Client implements WebSocket.Listener {
         } else {
             System.out.println("No board to show");
         }
-    }
-
-    private enum ClientState {
-        LOGGED_OUT,
-        LOGGED_IN,
-        GAMING
     }
 }
