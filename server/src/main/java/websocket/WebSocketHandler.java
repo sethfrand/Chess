@@ -1,8 +1,6 @@
 package websocket;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.InvalidMoveException;
+import chess.*;
 import com.google.gson.Gson;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
@@ -96,12 +94,12 @@ public class WebSocketHandler {
 
         ChessMove move = command.getMove();
         if (move == null) {
-            sendError(session, "no move given ");
+            sendError(session, " no move given ");
             return;
         }
 
         if (nowTurn != playerColor) {
-            sendError(session, "not your turn");
+            sendError(session, " not your turn ");
             return;
         }
 
@@ -115,25 +113,59 @@ public class WebSocketHandler {
             ChessGame.TeamColor oppoColor = (playerColor == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE);
 
             if (chessGame.isInCheckmate(oppoColor)) {
-                String mate = username + " wins the match! ";
+                String oppoUser = (oppoColor == ChessGame.TeamColor.WHITE) ? game.getWhiteUsername() : game.getBlackUsername();
+                String mate = oppoUser + " is in checkmate! " + username + " wins the match! ";
                 project(gameID, new NotificationMessage(mate));
             } else if (chessGame.isInStalemate(oppoColor)) {
                 String stale = "stalemate, there is no winner";
                 project(gameID, new NotificationMessage(stale));
             } else if (chessGame.isInCheck(oppoColor)) {
-                String check = oppoColor.toString().toLowerCase() + "is in check ";
+                String oppoUser = (oppoColor == ChessGame.TeamColor.WHITE) ? game.getWhiteUsername() : game.getBlackUsername();
+                String check = oppoUser + " is in check ";
                 project(gameID, new NotificationMessage(check));
             }
 
-            String notifyOthers = username + " just made a move.";
+            String description = describeMove(move, chessGame);
+            String notifyOthers = username + " just made a move. " + description;
             broadcastNotification(gameID, session, notifyOthers);
 
         } catch (InvalidMoveException e) {
-            sendError(session, "invalid move" + e.getMessage());
+            sendError(session, " invalid move " + e.getMessage());
         }
 
     }
 
+    private String describeMove(ChessMove move, ChessGame game) {
+        String startSquare = formatPos(move.getStartPosition());
+        String endSquare = formatPos(move.getEndPosition());
+
+        String type = "";
+        try {
+            if (game.getBoard().getPiece(move.getEndPosition()) != null) {
+                type = game.getBoard().getPiece(move.getEndPosition()).getPieceType().toString().toLowerCase();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        String moveDest = startSquare + " to " + endSquare;
+        if (!type.isEmpty()) {
+            moveDest = type + " to " + endSquare;
+        }
+
+        if (move.getPromotionPiece() != null) {
+            moveDest += " (promoted to " + move.getPromotionPiece().toString().toLowerCase() + ")! ";
+        }
+        return moveDest;
+    }
+
+    private String formatPos(ChessPosition position) {
+        int row = position.getRow();
+        int col = position.getColumn();
+
+        char letter = (char) +('a' + col - 1);
+        return letter + String.valueOf(row);
+    }
 
     private void project(int gameID, ServerMessage messege) {
         CopyOnWriteArrayList<Session> gameSession = SESSIONS.get(gameID);
@@ -310,7 +342,8 @@ public class WebSocketHandler {
 
             String gameRole = getUserRole(username, gameData);
             String role = "observer".equals(gameRole) ? "an observer " : "a player";
-            String notification = username + " has joined the game as a " + role;
+            String playerColor = username.equals(gameData.getWhiteUsername()) ? "white" : "black";
+            String notification = username + " has joined the game as a " + role + " playing as " + playerColor;
 
             broadcastNotification(gameID, session, notification);
 

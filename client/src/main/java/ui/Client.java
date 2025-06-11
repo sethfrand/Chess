@@ -62,7 +62,7 @@ public class Client implements WebSocket.Listener {
 
     @Override
     public void onOpen(WebSocket webSocket) {
-        System.out.println("WebSocket connection opened");
+        System.out.println("connection opened");
         WebSocket.Listener.super.onOpen(webSocket);
     }
 
@@ -74,7 +74,7 @@ public class Client implements WebSocket.Listener {
 
     @Override
     public CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason) {
-        System.out.println("Socket closed: " + reason);
+        System.out.println("connection closed: " + reason);
         return WebSocket.Listener.super.onClose(webSocket, statusCode, reason);
     }
 
@@ -406,7 +406,7 @@ public class Client implements WebSocket.Listener {
             int gameID = Integer.parseInt(parts[1]);
             String color = parts[2].toUpperCase();
             if (!color.equals("WHITE") && !color.equals("BLACK")) {
-                System.out.println("color must be WHITE or BLACK");
+                System.out.println(" color must be WHITE or BLACK ");
                 return;
             }
             GameData gameData = facade.getGame(gameID, authToken);
@@ -415,11 +415,11 @@ public class Client implements WebSocket.Listener {
                 return;
             }
             if (color.equals("WHITE") && gameData.getWhiteUsername() != null) {
-                System.out.println("The white user is already taken");
+                System.out.println(" The white user is already taken ");
                 return;
             }
             if (color.equals("BLACK") && gameData.getBlackUsername() != null) {
-                System.out.println("The black user is already taken");
+                System.out.println(" The black user is already taken ");
                 return;
             }
             {
@@ -437,7 +437,7 @@ public class Client implements WebSocket.Listener {
                     }
                     showBoard(team);
                 } else {
-                    System.out.println("You have joined " + gameID + " unsuccessfully!, one of the colors may be taken");
+                    System.out.println("You have joined " + gameID + " unsuccessfully!, one of the colors may be taken ");
                 }
             }
         } catch (NumberFormatException e) {
@@ -468,7 +468,7 @@ public class Client implements WebSocket.Listener {
             }
             showBoard(ChessGame.TeamColor.WHITE);
         } catch (Exception e) {
-            System.out.println("gameID is invalid, enter a number");
+            System.out.println("gameID is invalid, enter a number ");
         }
     }
 
@@ -479,7 +479,7 @@ public class Client implements WebSocket.Listener {
             try {
                 UserGameCommand resign = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, curGame.getGameID());
                 sendCommand(resign);
-                System.out.println("Resigning from the game");
+                System.out.println("Resigning from the game ");
             } catch (Exception e) {
                 System.out.println("Error resigning from game " + e.getMessage());
             }
@@ -494,7 +494,7 @@ public class Client implements WebSocket.Listener {
             System.out.println();
             Board.printBoard(board, team);
         } else {
-            System.out.println("No board to show");
+            System.out.println("No board to show ");
         }
     }
 }
