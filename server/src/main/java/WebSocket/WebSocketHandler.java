@@ -179,7 +179,7 @@ public class WebSocketHandler {
         String resigned = "the player " + username + " has resigned from the game";
         broadcastNotification(gameID, session, resigned);
 
-        NotificationMessage notify = new NotificationMessage("you have resigned from " + session);
+        NotificationMessage notify = new NotificationMessage("you have resigned from the game");
         sendMessage(session, notify);
 
     }

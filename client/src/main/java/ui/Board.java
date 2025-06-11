@@ -1,10 +1,11 @@
 package ui;
 
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import static ui.EscapeSequences.*;
 
@@ -33,7 +34,7 @@ public class Board {
 
 
         for (int row = 8; row >= 1; row--) {
-            printWhiteRow(board, row);
+            printWhiteRow(board, row, null, null);
         }
 
 
@@ -41,14 +42,25 @@ public class Board {
         System.out.println();
     }
 
+    private static void printWhiteHighlightBoard(ChessBoard board, ChessPosition square, Set<ChessPosition> highlights) {
+        System.out.print(ERASE_SCREEN);
 
-    private static void printWhiteRow(ChessBoard board, int row) {
+        System.out.println(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + SIDE_CHARS + RESET_BG_COLOR);
+        for (int row = 8; row >= 1; row--) {
+            printWhiteRow(board, row, square, highlights);
+        }
+        System.out.println(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + SIDE_CHARS + RESET_BG_COLOR);
+        System.out.println();
+    }
+
+
+    private static void printWhiteRow(ChessBoard board, int row, ChessPosition square, Set<ChessPosition> highlight) {
         System.out.print(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + " " + row + " " + RESET_BG_COLOR);
 
 
         for (int col = 1; col <= 8; col++) {
             ChessPosition position = new ChessPosition(row, col);
-            printEachSquare(board, position, row, col);
+            printEachSquare(board, position, row, col, square, highlight);
         }
         System.out.println(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + " " + row + " " + RESET_BG_COLOR);
     }
@@ -61,28 +73,49 @@ public class Board {
         String reverseSideChars = "    h  g  f  e  d  c  b  a    ";
         System.out.println(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + reverseSideChars + RESET_BG_COLOR);
         for (int row = 1; row <= 8; row++) {
-            printBlackRow(board, row);
+            printBlackRow(board, row, null, null);
+        }
+        System.out.println(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + reverseSideChars + RESET_BG_COLOR);
+        System.out.println();
+    }
+
+    private static void printBlackHighlightBoard(ChessBoard board, ChessPosition square, Set<ChessPosition> highlights) {
+        System.out.print(ERASE_SCREEN);
+
+
+        String reverseSideChars = "    h  g  f  e  d  c  b  a    ";
+        System.out.println(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + reverseSideChars + RESET_BG_COLOR);
+        for (int row = 1; row <= 8; row++) {
+            printBlackRow(board, row, square, highlights);
         }
         System.out.println(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + reverseSideChars + RESET_BG_COLOR);
         System.out.println();
     }
 
 
-    private static void printBlackRow(ChessBoard board, int row) {
+    private static void printBlackRow(ChessBoard board, int row, ChessPosition square, Set<ChessPosition> highlights) {
         System.out.print(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + " " + row + " " + RESET_BG_COLOR);
 //do the opposite of printing white rows
         for (int col = 8; col >= 1; col--) {
             ChessPosition position = new ChessPosition(row, col);
-            printEachSquare(board, position, row, col);
+            printEachSquare(board, position, row, col, square, highlights);
         }
         System.out.println(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + " " + row + " " + RESET_BG_COLOR);
     }
 
 
-    private static void printEachSquare(ChessBoard board, ChessPosition position, int row, int col) {
+    private static void printEachSquare(ChessBoard board, ChessPosition position, int row, int col, ChessPosition square,
+                                        Set<ChessPosition> highlights) {
         boolean isWhite = (row + col) % 2 == 0;
-        String color = isWhite ? SET_BG_COLOR_DARK_GREY : SET_BG_COLOR_LIGHT_GREY;
+        String color;
 
+        if (square != null && position.equals(square)) {
+            color = SET_BG_COLOR_BLUE;
+        } else if (highlights != null && highlights.contains(position)) {
+            color = SET_BG_COLOR_YELLOW;
+        } else {
+            color = isWhite ? SET_BG_COLOR_DARK_GREY : SET_BG_COLOR_LIGHT_GREY;
+        }
 
         ChessPiece piece = board.getPiece(position);
         String pieceChar = getPieceChar(piece);
@@ -123,5 +156,19 @@ public class Board {
         }
     }
 
+
+    public static void showBrightBoard(ChessBoard board, ChessGame.TeamColor perspective, ChessPosition square, Collection<ChessMove> moves) {
+        Set<ChessPosition> highlights = new HashSet<>();
+        if (moves != null) {
+            for (ChessMove move : moves) {
+                highlights.add(move.getEndPosition());
+            }
+        }
+        if (perspective == ChessGame.TeamColor.WHITE) {
+            printWhiteHighlightBoard(board, square, highlights);
+        } else {
+            printBlackHighlightBoard(board, square, highlights);
+        }
+    }
 
 }

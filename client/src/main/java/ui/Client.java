@@ -16,6 +16,7 @@ import websocket.commands.UserGameCommand;
 import websocket.messages.*;
 
 
+import java.util.Collection;
 import java.util.Scanner;
 
 public class Client extends WebSocketAdapter {
@@ -54,7 +55,7 @@ public class Client extends WebSocketAdapter {
             client.start();
         }
 
-        String socketURL = facade.getServerUrl().replace("https://", "ws://") + "/ws";
+        String socketURL = facade.getServerUrl().replace("http://", "ws://") + "/ws";
         URI uriServer = new URI(socketURL);
 
         session = client.connect(this, uriServer).get();
@@ -147,7 +148,7 @@ public class Client extends WebSocketAdapter {
             try {
                 processCommand(input);
             } catch (Exception e) {
-                System.out.println("Error" + e.getMessage());
+                System.out.println("Error " + e.getMessage());
             }
         }
     }
@@ -184,7 +185,7 @@ public class Client extends WebSocketAdapter {
             case ("leave") -> exitGame();
             case ("move") -> makeMove(string);
             case ("resign") -> resignGame();
-            case ("highlight") -> System.out.println("this will highlight all the moves that the player can make");
+            case ("highlight") -> highlightSquares(string);
             default -> System.out.println("command " + command + " unknown, type 'help' for a list of commands");
         }
     }
@@ -236,6 +237,63 @@ public class Client extends WebSocketAdapter {
             return null;
         }
         return new ChessPosition(row, col);
+    }
+
+    private void highlightSquares(String[] parts) {
+        if (parts.length != 2) {
+            System.out.println("incorrect arguments, use correct format: highlight <position>");
+            System.out.println("Example: highlight e4");
+            return;
+        }
+        try {
+            String posString = parts[1].toLowerCase();
+            ChessPosition square = convertPos(posString);
+
+            if (square == null) {
+                System.out.println("invalid format, use correct format");
+                System.out.println("Example: e4");
+                return;
+            }
+            ChessPiece piece = curGame.getGame().getBoard().getPiece(square);
+            if (piece == null) {
+                System.out.println("There is no piece at " + posString);
+                return;
+            }
+
+            Collection<ChessMove> moves = curGame.getGame().validMoves(square);
+            if (moves.isEmpty()) {
+                System.out.println("no valid moves for piece at " + square);
+
+            }
+
+            System.out.println("valid moves for " + piece.getPieceType() + " located on " + square + "");
+            for (ChessMove move : moves) {
+                String moveStr = positiontoString(move.getEndPosition());
+                System.out.println(moveStr + " ");
+            }
+            System.out.println();
+
+            showBrightBoard(team != null ? team : ChessGame.TeamColor.WHITE, square, moves);
+
+        } catch (Exception e) {
+            System.out.println("Error highlighting moves " + e.getMessage());
+        }
+
+
+    }
+
+    private void showBrightBoard(ChessGame.TeamColor perspective, ChessPosition square, Collection<ChessMove> moves) {
+        if (curGame != null && curGame.getGame() != null) {
+            ChessBoard board = curGame.getGame().getBoard();
+            System.out.println();
+            Board.showBrightBoard(board, perspective, square, moves);
+        }
+    }
+
+    private String positiontoString(ChessPosition endPosition) {
+        char col = (char) ('a' + endPosition.getColumn() - 1);
+        return "" + col + endPosition.getRow();
+
     }
 
     private void redoBoard() {
@@ -319,7 +377,7 @@ public class Client extends WebSocketAdapter {
             System.out.println("registered and logging in as " + username);
 
         } else {
-            System.out.println("failed registration");
+            System.out.println("failed registration ");
         }
     }
 
@@ -329,7 +387,7 @@ public class Client extends WebSocketAdapter {
             curUser = null;
             state = ClientState.LOGGED_OUT;
         } else {
-            System.out.println("logout failed");
+            System.out.println("logout failed ");
         }
     }
 
@@ -344,7 +402,7 @@ public class Client extends WebSocketAdapter {
         if (gameID > 0) {
             System.out.println("game with " + gameID + " created. Feel free to join!");
         } else {
-            System.out.println("game creation failed");
+            System.out.println("game creation failed ");
         }
     }
 
@@ -358,7 +416,7 @@ public class Client extends WebSocketAdapter {
         System.out.println("Available games");
         System.out.println("ID | GAME NAME | WHITE PLAYER | BLACK PLAYER");
         for (var game : games) {
-            System.out.printf("%d | %s | %s | %s%n",
+            System.out.printf("%d  |     %s    |      %s      | %s%n",
                     game.getGameID(), game.getGameName(),
                     game.getWhiteUsername() != null ? game.getWhiteUsername() : "none",
                     game.getBlackUsername() != null ? game.getBlackUsername() : "none");
@@ -417,9 +475,9 @@ public class Client extends WebSocketAdapter {
                 }
             }
         } catch (NumberFormatException e) {
-            System.out.println("gameID is invalid, enter a number");
+            System.out.println("gameID is invalid, enter a number ");
         } catch (Exception e) {
-            System.out.println("error joining game");
+            System.out.println("error joining game ");
         }
     }
 
