@@ -307,12 +307,12 @@ public class WebSocketHandler {
         SESSIONS.computeIfAbsent(gameID, i -> new CopyOnWriteArrayList<>()).add(session);
     }
 
-    private void broadcastNotification(Integer gameId, Session ExcludeSession, String message) {
+    private void broadcastNotification(Integer gameId, Session excludeSession, String message) {
         NotificationMessage notification = new NotificationMessage(message);
         CopyOnWriteArrayList<Session> gameSession = SESSIONS.get(gameId);
         if (gameSession != null) {
             for (Session session : gameSession) {
-                if (session != ExcludeSession) {
+                if (session != excludeSession) {
                     sendMessage(session, notification);
                 }
             }
