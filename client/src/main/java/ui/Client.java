@@ -200,6 +200,28 @@ public class Client implements WebSocket.Listener {
                 return;
             }
 
+
+            ChessPiece piece = curGame.getGame().getBoard().getPiece(fromPos);
+            ChessPiece.PieceType promoPiece = null;
+
+
+            if (piece != null && piece.getPieceType() == ChessPiece.PieceType.PAWN) {
+                boolean promo = false;
+                if (piece.getTeamColor() == ChessGame.TeamColor.WHITE && toPos.getRow() == 8) {
+                    promo = true;
+                }
+                if (piece.getTeamColor() == ChessGame.TeamColor.BLACK && toPos.getRow() == 1) {
+                    promo = true;
+                }
+                if (promo) {
+                    promoPiece = getPromoPiece();
+                    if (promoPiece == null) {
+                        System.out.println("invalid promo piece");
+                    }
+                }
+            }
+
+
             ChessMove move = new ChessMove(fromPos, toPos, null);
             UserGameCommand moveCommand = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, curGame.getGameID(), move);
             sendCommand(moveCommand);
@@ -207,6 +229,26 @@ public class Client implements WebSocket.Listener {
         } catch (Exception e) {
             System.out.println("Error making a move " + e.getMessage());
         }
+    }
+
+    private ChessPiece.PieceType getPromoPiece() {
+        System.out.println("Choose a piece to Promote");
+        System.out.println("Queen");
+        System.out.println("Rook");
+        System.out.println("Bishop");
+        System.out.println("Knight");
+        System.out.println("Please enter the first letter of the piece you would like, if no piece is chosen, a queen will be given");
+
+        String newPiece = scanner.nextLine().trim().toUpperCase();
+
+        return switch (newPiece) {
+            case "Q" -> ChessPiece.PieceType.QUEEN;
+            case "R" -> ChessPiece.PieceType.ROOK;
+            case "K" -> ChessPiece.PieceType.KNIGHT;
+            case "B" -> ChessPiece.PieceType.BISHOP;
+            default -> ChessPiece.PieceType.QUEEN;
+        };
+
     }
 
     static boolean isValidMove(int row, int col) {
